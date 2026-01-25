@@ -1,23 +1,23 @@
-const CACHE_NAME = 'space-community-v1';
-const ASSETS = [
-    '/',
-    '/index.html',
-    '/isotipo.png',
-    '/logotipo.png'
-];
+const CACHE_NAME = 'space-community-v2';
 
 self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Force the waiting service worker to become the active service worker
+});
+
+self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
-        })
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    // Delete all old caches
+                    return caches.delete(cacheName);
+                })
+            );
+        }).then(() => self.clients.claim()) // Become the active service worker for all open clients
     );
 });
 
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        })
-    );
+    // Bypass cache and go straight to network to ensure fresh assets
+    event.respondWith(fetch(event.request));
 });
