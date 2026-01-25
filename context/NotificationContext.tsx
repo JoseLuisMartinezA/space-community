@@ -20,7 +20,7 @@ interface NotificationContextType {
     notifications: AppNotification[];
     markAsRead: (notificationId: string) => Promise<void>;
     markMessagesAsRead: (senderId: string) => Promise<void>;
-    markAllAsRead: () => Promise<void>;
+    clearAllNotifications: () => Promise<void>;
     notificationTrigger: number;
     fetchNotifications: () => Promise<void>;
 }
@@ -31,6 +31,7 @@ const NotificationContext = createContext<NotificationContextType>({
     markAsRead: async () => { },
     markMessagesAsRead: async () => { },
     markAllAsRead: async () => { },
+    clearAllNotifications: async () => { },
     notificationTrigger: 0,
     fetchNotifications: async () => { }
 });
@@ -120,18 +121,39 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const markAllAsRead = async () => {
         if (!user) return;
 
-        // Mark all notifications as read
         await supabase
             .from('notifications')
             .update({ is_read: true })
             .eq('user_id', user.id)
             .eq('is_read', false);
 
-        // Also mark all messages as read? Usually better to keep it specific, 
-        // but for "Clear All" in menu we usually just clear notifications.
-
         fetchNotifications();
         setNotificationTrigger(prev => prev + 1);
+    };
+
+    const clearAllNotifications = async () => {
+        if (!user) return;
+
+        // Optimistic Update: Clear local state immediately
+        const previousNotifications = [...notifications];
+        const previousUnread = unreadCount;
+
+        setNotifications([]);
+        setUnreadCount(0);
+
+        const { error } = await supabase
+            .from('notifications')
+            .delete()
+            .eq('user_id', user.id);
+
+        if (error) {
+            // Fallback in case of error
+            setNotifications(previousNotifications);
+            setUnreadCount(previousUnread);
+            console.error("Error al borrar notificaciones:", error);
+        } else {
+            setNotificationTrigger(prev => prev + 1);
+        }
     };
 
     return (
@@ -141,6 +163,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             markAsRead,
             markMessagesAsRead,
             markAllAsRead,
+            clearAllNotifications,
             notificationTrigger,
             fetchNotifications
         }}>

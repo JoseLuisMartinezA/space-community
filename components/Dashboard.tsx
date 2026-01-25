@@ -1,21 +1,17 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getNextLaunch } from '../services/spacex';
 import { NextLaunchData } from '../types';
-import { useNotifications } from '../context/NotificationContext';
 import { useTheme } from '../context/ThemeContext';
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
-    const { unreadCount, notifications, markAsRead, markAllAsRead } = useNotifications();
-    const { theme, toggleTheme } = useTheme();
+    const { theme } = useTheme();
+
+    // Cleaned up Dashboard
     const [nextLaunch, setNextLaunch] = useState<NextLaunchData | null>(null);
     const [loading, setLoading] = useState(true);
     const [countdown, setCountdown] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
-    const [showNotifications, setShowNotifications] = useState(false);
-    const [showSettings, setShowSettings] = useState(false);
-    const notificationRef = useRef<HTMLDivElement>(null);
-    const settingsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -29,19 +25,6 @@ const Dashboard: React.FC = () => {
             }
         };
         fetchData();
-    }, []);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-                setShowNotifications(false);
-            }
-            if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
-                setShowSettings(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     useEffect(() => {
@@ -67,27 +50,6 @@ const Dashboard: React.FC = () => {
         return () => clearInterval(interval);
     }, [nextLaunch]);
 
-    const getRelativeTime = (dateString: string) => {
-        const now = new Date();
-        const date = new Date(dateString);
-        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-        if (diffInSeconds < 60) return 'ahora';
-        if (diffInSeconds < 3600) return `hace ${Math.floor(diffInSeconds / 60)}m`;
-        if (diffInSeconds < 86400) return `hace ${Math.floor(diffInSeconds / 3600)}h`;
-        return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-    };
-
-    const handleNotificationClick = (notif: any) => {
-        markAsRead(notif.id);
-        setShowNotifications(false);
-        // Navigate based on type
-        if (notif.type === 'message') {
-            navigate('/profile'); // In a real app, maybe navigate to specific chat
-        } else if (notif.type === 'friend_request' || notif.type === 'request_accepted') {
-            navigate('/profile');
-        }
-    };
-
     // Format Date
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('es-ES', {
@@ -99,187 +61,7 @@ const Dashboard: React.FC = () => {
         <div className="p-4 md:p-8 lg:p-10 pb-20 md:pb-10">
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl md:text-4xl text-white font-serif font-medium tracking-tight">Control de Misión</h2>
-                <div className="flex items-center gap-4 relative" ref={notificationRef}>
-                    {/* Notification Button */}
-                    <button
-                        onClick={() => setShowNotifications(!showNotifications)}
-                        className={`relative size-10 rounded-full border transition-all flex items-center justify-center ${showNotifications ? 'bg-primary border-primary text-background-dark shadow-glow' : 'bg-surface-dark border-white/5 text-slate-400 hover:text-white hover:border-white/20'}`}
-                    >
-                        <span className="material-symbols-outlined">notifications</span>
-                        {unreadCount > 0 && (
-                            <div className="absolute top-0 right-0 size-3 bg-red-500 rounded-full border-2 border-surface-dark"></div>
-                        )}
-                    </button>
-
-                    {/* Notification Dropdown */}
-                    {showNotifications && (
-                        <div className="absolute top-12 right-0 w-80 bg-surface-dark/95 backdrop-blur-md border border-white/10 rounded-2xl shadow-glow-lg z-50 overflow-hidden animate-slideUp">
-                            <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
-                                <h3 className="text-sm font-bold text-white uppercase tracking-widest">Notificaciones</h3>
-                                {unreadCount > 0 && (
-                                    <button onClick={markAllAsRead} className="text-[10px] text-primary hover:underline font-bold uppercase tracking-tighter">
-                                        Limpiar Todo
-                                    </button>
-                                )}
-                            </div>
-                            <div className="max-h-[400px] overflow-y-auto">
-                                {notifications.length === 0 ? (
-                                    <div className="p-8 text-center text-slate-500 flex flex-col items-center gap-2">
-                                        <span className="material-symbols-outlined text-4xl opacity-20">notifications_off</span>
-                                        <p className="text-sm">No hay actividad reciente</p>
-                                    </div>
-                                ) : (
-                                    notifications.map(notif => (
-                                        <div
-                                            key={notif.id}
-                                            onClick={() => handleNotificationClick(notif)}
-                                            className={`p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors flex gap-3 ${!notif.is_read ? 'bg-primary/5' : ''}`}
-                                        >
-                                            <div className="relative shrink-0">
-                                                <img src={notif.source_avatar} className="size-10 rounded-full object-cover" />
-                                                <div className={`absolute -bottom-1 -right-1 size-5 rounded-full flex items-center justify-center border border-surface-dark ${notif.type === 'message' ? 'bg-blue-500' :
-                                                    notif.type === 'friend_request' ? 'bg-primary' : 'bg-emerald-500'
-                                                    }`}>
-                                                    <span className="material-symbols-outlined text-[12px] text-white">
-                                                        {notif.type === 'message' ? 'chat' :
-                                                            notif.type === 'friend_request' ? 'person_add' : 'check'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex justify-between items-start mb-0.5">
-                                                    <p className="text-xs font-bold text-white truncate pr-2">{notif.title}</p>
-                                                    <span className="text-[10px] text-slate-500 whitespace-nowrap">{getRelativeTime(notif.created_at)}</span>
-                                                </div>
-                                                <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{notif.content}</p>
-                                            </div>
-                                            {!notif.is_read && <div className="size-2 rounded-full bg-primary mt-1 shrink-0"></div>}
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                            <div className="p-3 bg-black/20 text-center">
-                                <Link to="/profile" onClick={() => setShowNotifications(false)} className="text-xs text-slate-400 hover:text-white transition-colors">Ver todo mi perfil</Link>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Settings Button */}
-                    <div className="relative" ref={settingsRef}>
-                        <button
-                            onClick={() => setShowSettings(!showSettings)}
-                            className={`size-10 rounded-full border transition-all flex items-center justify-center ${showSettings ? 'bg-primary border-primary text-background-dark shadow-glow' : 'bg-surface-dark border-white/5 text-slate-400 hover:text-white hover:border-white/20'}`}
-                        >
-                            <span className="material-symbols-outlined">settings</span>
-                        </button>
-
-                        {/* Settings Dropdown */}
-                        {showSettings && (
-                            <div className="absolute top-12 right-0 w-72 bg-surface-dark/95 backdrop-blur-md border border-white/10 rounded-2xl shadow-glow-lg z-50 overflow-hidden animate-slideUp">
-                                <div className="p-4 border-b border-white/5 bg-white/5">
-                                    <h3 className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-[18px]">tune</span>
-                                        Ajustes
-                                    </h3>
-                                </div>
-
-                                <div className="p-2">
-                                    {/* Theme Toggle */}
-                                    <div className="p-3 hover:bg-white/5 rounded-lg transition-colors">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center gap-3">
-                                                <span className="material-symbols-outlined text-primary">
-                                                    {theme === 'dark' ? 'dark_mode' : 'light_mode'}
-                                                </span>
-                                                <div>
-                                                    <p className="text-sm font-medium text-white">Tema</p>
-                                                    <p className="text-xs text-slate-400">
-                                                        {theme === 'dark' ? 'Modo Oscuro' : 'Modo Claro'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={toggleTheme}
-                                                className={`relative w-12 h-6 rounded-full transition-colors ${theme === 'dark' ? 'bg-primary' : 'bg-slate-600'}`}
-                                            >
-                                                <div className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0'}`} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Notifications Settings */}
-                                    <button
-                                        className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left"
-                                        onClick={() => {
-                                            setShowSettings(false);
-                                            navigate('/profile');
-                                        }}
-                                    >
-                                        <span className="material-symbols-outlined text-slate-400">notifications</span>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-medium text-white">Notificaciones</p>
-                                            <p className="text-xs text-slate-400">Gestionar preferencias</p>
-                                        </div>
-                                        <span className="material-symbols-outlined text-slate-600 text-[18px]">chevron_right</span>
-                                    </button>
-
-                                    {/* Language */}
-                                    <button className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left">
-                                        <span className="material-symbols-outlined text-slate-400">language</span>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-medium text-white">Idioma</p>
-                                            <p className="text-xs text-slate-400">Español</p>
-                                        </div>
-                                        <span className="material-symbols-outlined text-slate-600 text-[18px]">chevron_right</span>
-                                    </button>
-
-                                    {/* Privacy */}
-                                    <button className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left">
-                                        <span className="material-symbols-outlined text-slate-400">shield</span>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-medium text-white">Privacidad</p>
-                                            <p className="text-xs text-slate-400">Seguridad y datos</p>
-                                        </div>
-                                        <span className="material-symbols-outlined text-slate-600 text-[18px]">chevron_right</span>
-                                    </button>
-
-                                    <div className="border-t border-white/5 my-2"></div>
-
-                                    {/* Account Settings */}
-                                    <button
-                                        className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left"
-                                        onClick={() => {
-                                            setShowSettings(false);
-                                            navigate('/profile');
-                                        }}
-                                    >
-                                        <span className="material-symbols-outlined text-slate-400">person</span>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-medium text-white">Mi Cuenta</p>
-                                            <p className="text-xs text-slate-400">Perfil y configuración</p>
-                                        </div>
-                                        <span className="material-symbols-outlined text-slate-600 text-[18px]">chevron_right</span>
-                                    </button>
-
-                                    {/* Help */}
-                                    <button className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left">
-                                        <span className="material-symbols-outlined text-slate-400">help</span>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-medium text-white">Ayuda y Soporte</p>
-                                            <p className="text-xs text-slate-400">Centro de ayuda</p>
-                                        </div>
-                                        <span className="material-symbols-outlined text-slate-600 text-[18px]">chevron_right</span>
-                                    </button>
-                                </div>
-
-                                <div className="p-3 bg-black/20 text-center border-t border-white/5">
-                                    <p className="text-xs text-slate-500">SpaceX Community v2.0.1</p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                <h2 className="text-3xl md:text-4xl text-white font-serif font-medium tracking-tight">Space Community Dashboard</h2>
             </div>
             {/* Dashboard Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-10">
@@ -287,7 +69,16 @@ const Dashboard: React.FC = () => {
                 <div className="lg:col-span-8 flex flex-col gap-6">
                     {/* Mission Live Card */}
                     <div className="relative w-full rounded-2xl overflow-hidden group min-h-[400px] flex flex-col justify-end p-8 border border-white/10 shadow-glow">
-                        <div className="absolute inset-0 z-0 transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: 'linear-gradient(to top, rgba(17,17,23,0.95) 10%, rgba(17,17,23,0.3) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2WBd-n8BMU51kzz_d9fMRAJjSxg0GPGELh8HhdROikAPdsDGoUaug7MdaO-h54zZmaiwfjLFES7EGkUgz3x5q1Ee5g5XBjvpU8ZF-kGzySwfdQjco2haJylJE-rgYQUcSXoKBqKDPd1GKBkqtysgx6NPX6y-GEQkKk3k8XZvCIh35axZIVALWxEF8JIjUU1E0d9BSpAionK0z682sF_Ezi4HvfxzGkPn8S9Z-fx_uLJHEhehamsB4Aufi7JOVHF0fcEegxBEKsOI")', backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+                        <div
+                            className="absolute inset-0 z-0 transition-transform duration-700 group-hover:scale-105"
+                            style={{
+                                backgroundImage: theme === 'dark'
+                                    ? 'linear-gradient(to top, rgba(17,17,23,0.95) 10%, rgba(17,17,23,0.3) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2WBd-n8BMU51kzz_d9fMRAJjSxg0GPGELh8HhdROikAPdsDGoUaug7MdaO-h54zZmaiwfjLFES7EGkUgz3x5q1Ee5g5XBjvpU8ZF-kGzySwfdQjco2haJylJE-rgYQUcSXoKBqKDPd1GKBkqtysgx6NPX6y-GEQkKk3k8XZvCIh35axZIVALWxEF8JIjUU1E0d9BSpAionK0z682sF_Ezi4HvfxzGkPn8S9Z-fx_uLJHEhehamsB4Aufi7JOVHF0fcEegxBEKsOI")'
+                                    : 'linear-gradient(to top, rgba(255,255,255,0.9) 10%, rgba(255,255,255,0.2) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2WBd-n8BMU51kzz_d9fMRAJjSxg0GPGELh8HhdROikAPdsDGoUaug7MdaO-h54zZmaiwfjLFES7EGkUgz3x5q1Ee5g5XBjvpU8ZF-kGzySwfdQjco2haJylJE-rgYQUcSXoKBqKDPd1GKBkqtysgx6NPX6y-GEQkKk3k8XZvCIh35axZIVALWxEF8JIjUU1E0d9BSpAionK0z682sF_Ezi4HvfxzGkPn8S9Z-fx_uLJHEhehamsB4Aufi7JOVHF0fcEegxBEKsOI")',
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center'
+                            }}
+                        ></div>
 
                         {loading ? (
                             <div className="relative z-10 flex flex-col items-center justify-center h-full min-h-[300px]">
@@ -497,6 +288,100 @@ const Dashboard: React.FC = () => {
                         <div className="flex items-end gap-2">
                             <p className="text-2xl font-bold text-white">ASOG <span className="text-sm text-slate-500 font-normal">Dron</span></p>
                             <span className="text-xs text-[#0bda50] mb-1">En Estación</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Platform Features Section */}
+            <div className="py-16 md:py-20 border-t border-white/5">
+                <h2 className="text-3xl md:text-4xl font-serif text-white text-center mb-12">Funcionalidades de la Plataforma</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div
+                        onClick={() => navigate('/launches')}
+                        className="bg-surface-dark p-8 rounded-2xl border border-white/5 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                    >
+                        <span className="material-symbols-outlined text-4xl text-primary mb-6 group-hover:scale-110 transition-transform block w-fit">rocket_launch</span>
+                        <h3 className="text-xl font-bold text-white mb-3">Datos en Tiempo Real</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed">Accede a información actualizada de lanzamientos, cohetes y misiones de SpaceX</p>
+                    </div>
+
+                    <div
+                        onClick={() => navigate('/community')}
+                        className="bg-surface-dark p-8 rounded-2xl border border-white/5 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                    >
+                        <span className="material-symbols-outlined text-4xl text-blue-400 mb-6 group-hover:scale-110 transition-transform block w-fit">forum</span>
+                        <h3 className="text-xl font-bold text-white mb-3">Foro de Comunidad</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed">Participa en discusiones con otros entusiastas del espacio</p>
+                    </div>
+
+                    <div
+                        onClick={() => navigate('/profile')}
+                        className="bg-surface-dark p-8 rounded-2xl border border-white/5 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                    >
+                        <span className="material-symbols-outlined text-4xl text-purple-400 mb-6 group-hover:scale-110 transition-transform block w-fit">groups</span>
+                        <h3 className="text-xl font-bold text-white mb-3">Red Social</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed">Conecta con otros miembros, haz amigos y comparte tu pasión</p>
+                    </div>
+
+                    <div
+                        onClick={() => navigate('/statistics')}
+                        className="bg-surface-dark p-8 rounded-2xl border border-white/5 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                    >
+                        <span className="material-symbols-outlined text-4xl text-[#0bda50] mb-6 group-hover:scale-110 transition-transform block w-fit">monitoring</span>
+                        <h3 className="text-xl font-bold text-white mb-3">Estadísticas</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed">Visualiza datos y gráficos sobre el rendimiento de SpaceX</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* About SpaceX Section */}
+            <div className="py-16 md:py-24 bg-surface-dark -mx-4 md:-mx-8 lg:-mx-10 px-4 md:px-8 lg:px-10 border-y border-white/5 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
+                <div className="max-w-4xl mx-auto text-center relative z-10">
+                    <h2 className="text-3xl md:text-5xl font-serif text-white mb-12">Acerca de SpaceX</h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                        <div className="p-6">
+                            <p className="text-4xl md:text-5xl font-bold text-primary mb-2">9500</p>
+                            <p className="text-slate-400 dark:text-slate-500 uppercase tracking-widest text-sm">Empleados</p>
+                        </div>
+                        <div className="p-6 relative md:after:content-[''] md:after:absolute md:after:right-0 md:after:top-1/2 md:after:-translate-y-1/2 md:after:h-12 md:after:w-px md:after:bg-black/10 md:dark:after:bg-white/10 md:before:content-[''] md:before:absolute md:before:left-0 md:before:top-1/2 md:before:-translate-y-1/2 md:before:h-12 md:before:w-px md:before:bg-black/10 md:dark:before:bg-white/10">
+                            <p className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">4</p>
+                            <p className="text-slate-400 dark:text-slate-500 uppercase tracking-widest text-sm">Vehículos</p>
+                        </div>
+                        <div className="p-6">
+                            <p className="text-4xl md:text-5xl font-bold text-purple-400 mb-2">3</p>
+                            <p className="text-slate-400 dark:text-slate-500 uppercase tracking-widest text-sm">Sitios de Lanzamiento</p>
+                        </div>
+                    </div>
+
+                    <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto font-light">
+                        SpaceX designs, manufactures and launches advanced rockets and spacecraft. The company was founded in 2002 to revolutionize space technology, with the ultimate goal of enabling people to live on other planets.
+                    </p>
+                </div>
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+            </div>
+
+            {/* Community CTA Section */}
+            <div className="pt-16 md:pt-20">
+                <div className="rounded-3xl relative overflow-hidden p-8 md:p-16 text-center shadow-2xl group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#4c1d95] transition-all duration-700 group-hover:scale-105"></div>
+                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+
+                    <div className="relative z-10 max-w-2xl mx-auto">
+                        <h2 className="text-3xl md:text-5xl font-serif font-bold !text-white mb-6">Únete a la Comunidad</h2>
+                        <p className="text-indigo-100 text-lg mb-10 leading-relaxed !text-white/90">
+                            Conecta con miles de entusiastas del espacio, participa en discusiones y mantente actualizado con cada misión de SpaceX.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <button onClick={() => navigate('/community')} className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/25">
+                                Explorar el Foro
+                            </button>
+                            <button onClick={() => navigate('/community')} className="w-full sm:w-auto px-8 py-3.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-purple-500/25">
+                                Ver Comunidad
+                            </button>
                         </div>
                     </div>
                 </div>

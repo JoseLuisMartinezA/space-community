@@ -263,8 +263,6 @@ export const PublicProfile: React.FC = () => {
                                 <h1 className="text-4xl font-serif font-bold text-white tracking-tight">{profile.name}</h1>
                                 <div className="flex items-center gap-3 text-lg font-mono text-primary/80">
                                     <span>{profile.handle.startsWith('@') ? profile.handle : `@${profile.handle}`}</span>
-                                    <span className="size-1.5 rounded-full bg-slate-600"></span>
-                                    <span className="text-slate-400 capitalize">{profile.role || 'Tripulante'}</span>
                                 </div>
                             </div>
 

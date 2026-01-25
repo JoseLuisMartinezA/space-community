@@ -57,3 +57,70 @@ export const getPastLaunches = async (limit = 10): Promise<SpaceXLaunch[]> => {
     return [];
   }
 };
+
+/**
+ * Fetch upcoming launches
+ */
+export const getUpcomingLaunches = async (limit = 10): Promise<SpaceXLaunch[]> => {
+  try {
+    const response = await fetch(`${BASE_URL}/launches/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: { upcoming: true },
+        options: {
+          limit,
+          sort: { date_utc: 'asc' }, // Soonest first
+          populate: ['rocket', 'launchpad']
+        }
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch upcoming launches');
+    const data = await response.json();
+    return data.docs;
+  } catch (error) {
+    console.error('SpaceX API Error:', error);
+    return [];
+  }
+};
+
+/**
+ * Fetch all rockets
+ */
+export const getAllRockets = async (): Promise<SpaceXRocket[]> => {
+  try {
+    const response = await fetch(`${BASE_URL}/rockets`);
+    if (!response.ok) throw new Error('Failed to fetch rockets');
+    return await response.json();
+  } catch (error) {
+    console.error('SpaceX API Error:', error);
+    return [];
+  }
+};
+
+/**
+ * Fetch all past launches for statistics (lightweight payload)
+ */
+export const getAllLaunchesForStats = async (): Promise<SpaceXLaunch[]> => {
+  try {
+    const response = await fetch(`${BASE_URL}/launches/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: { upcoming: false },
+        options: {
+          pagination: false, // Get all
+          select: ['success', 'date_utc', 'name', 'failures'] // Only needed fields
+        }
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch stats');
+    const data = await response.json();
+    return data.docs;
+  } catch (error) {
+    console.error('SpaceX API Error:', error);
+    return [];
+  }
+};

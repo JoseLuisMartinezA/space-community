@@ -249,49 +249,24 @@ const Community: React.FC = () => {
         <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-24">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start h-full">
                 {/* LEFT COLUMN */}
-                <aside className="hidden lg:flex lg:col-span-3 flex-col gap-6 sticky top-24">
-                    {/* Navigation Module */}
-                    <nav className="bg-surface-dark rounded-xl border border-white/5 p-4 flex flex-col gap-2 shadow-lg">
-                        <div className="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider font-mono">Navegación</div>
-                        <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                            <span className="material-symbols-outlined text-[22px] group-hover:text-primary transition-colors">satellite_alt</span>
-                            <span className="text-sm font-medium">Centro de Mando</span>
-                        </Link>
-                        <Link to="/milestones" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                            <span className="material-symbols-outlined text-[22px] group-hover:text-primary transition-colors">rocket</span>
-                            <span className="text-sm font-medium">Historial de Lanzamientos</span>
-                        </Link>
-                        <Link to="/support" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all group">
-                            <span className="material-symbols-outlined text-[22px] group-hover:text-primary transition-colors">handyman</span>
-                            <span className="text-sm font-medium">Soporte Técnico</span>
-                        </Link>
-                        <a className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border-l-2 border-primary transition-all" href="#">
-                            <span className="material-symbols-outlined icon-fill text-[22px]">forum</span>
-                            <span className="text-sm font-semibold">Feed</span>
-                        </a>
-                    </nav>
-                    {/* Mini Status Card */}
-                    <div className="bg-gradient-to-br from-surface-dark to-surface-darker rounded-xl border border-white/5 p-5 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <span className="material-symbols-outlined text-6xl">public</span>
-                        </div>
-                        <h3 className="text-white font-serif font-medium mb-1">Vuelo Starship 5</h3>
-                        <p className="text-slate-400 text-xs mb-4">Ventana de Lanzamiento: T-menos 48h</p>
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary w-[75%]"></div>
-                            </div>
-                            <span className="text-xs text-primary font-mono">75%</span>
-                        </div>
-                        <p className="text-[10px] text-slate-500">Revisión de Preparación Completa</p>
-                    </div>
-                </aside>
+
 
                 {/* CENTER COLUMN: Feed */}
-                <section className="col-span-1 lg:col-span-6 flex flex-col gap-6">
+                <section className="col-span-1 lg:col-span-9 flex flex-col gap-6">
                     {/* Headline & Filters */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <h2 className="text-2xl font-bold text-white tracking-tight">Transmisiones Activas</h2>
+
+                        {/* Search Bar */}
+                        <div className="flex-1 max-w-md mx-auto sm:mx-0 w-full relative group z-20">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 group-focus-within:text-primary transition-colors">search</span>
+                            <input
+                                type="text"
+                                placeholder="Buscar en la comunidad..."
+                                className="w-full bg-surface-darker/50 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary/50 focus:bg-surface-darker transition-all"
+                            />
+                        </div>
+
                         <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
                             <button
                                 onClick={() => setActiveFilter('trending')}
@@ -307,13 +282,7 @@ const Community: React.FC = () => {
                                 <span className="material-symbols-outlined text-[16px]">schedule</span>
                                 Recientes
                             </button>
-                            <button
-                                onClick={() => setActiveFilter('trending')}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium whitespace-nowrap transition-colors ${activeFilter === 'trending' ? 'bg-surface-dark border-primary/30 text-primary shadow-glow' : 'bg-surface-dark border-white/5 text-slate-400 hover:text-white'}`}
-                            >
-                                <span className="material-symbols-outlined text-[16px]">favorite</span>
-                                Más Me Gusta
-                            </button>
+
                             <button
                                 onClick={() => setActiveFilter('verified')}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium whitespace-nowrap transition-colors ${activeFilter === 'verified' ? 'bg-surface-dark border-primary/30 text-primary shadow-glow' : 'bg-surface-dark border-white/5 text-slate-400 hover:text-white'}`}
@@ -626,37 +595,13 @@ const Community: React.FC = () => {
 
                 {/* RIGHT COLUMN */}
                 <aside className="hidden lg:flex lg:col-span-3 flex-col gap-6 sticky top-24">
-                    {/* Telemetry / Stats */}
-                    <div className="bg-surface-dark rounded-xl border border-white/5 p-5 flex flex-col gap-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Mi Telemetría</h3>
-                            <span className="material-symbols-outlined text-slate-600 text-[20px]">equalizer</span>
-                        </div>
-                        <div className="flex items-center justify-center py-2 relative">
-                            <div className="size-32 rounded-full border-[12px] border-surface-darker relative flex items-center justify-center">
-                                <div className="absolute inset-0 rounded-full border-[12px] border-primary border-t-transparent border-l-transparent -rotate-45"></div>
-                                <div className="flex flex-col items-center">
-                                    <span className="text-2xl font-bold text-white">94</span>
-                                    <span className="text-[10px] text-slate-400 uppercase">Reputación</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-center text-xs">
-                                <span className="text-slate-400">Salud de Contribución</span>
-                                <span className="text-emerald-400 font-medium">Excelente</span>
-                            </div>
-                            <div className="w-full bg-surface-darker h-1.5 rounded-full overflow-hidden">
-                                <div className="bg-emerald-500 h-full w-[95%]"></div>
-                            </div>
-                        </div>
-                    </div>
+
                     {/* Safe Haven Protocols */}
                     <div className="bg-surface-dark rounded-xl border border-white/5 p-5 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-transparent"></div>
                         <div className="flex items-center gap-2 mb-4">
                             <span className="material-symbols-outlined text-primary">shield</span>
-                            <h3 className="text-lg font-serif font-bold text-white">Protocolos de Refugio Seguro</h3>
+                            <h3 className="text-lg font-serif font-bold text-white">Normas de la comunidad</h3>
                         </div>
                         <ul className="space-y-4">
                             <li className="flex gap-3 items-start">

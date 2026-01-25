@@ -63,10 +63,6 @@ const TechSupport: React.FC = () => {
                                 <span className="text-sm text-white">Base de Datos de Usuarios</span>
                                 <span className="text-xs font-bold text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded">MANTENIMIENTO</span>
                             </div>
-                            <div className="flex items-center justify-between p-3 bg-surface-darker rounded-lg border border-white/5">
-                                <span className="text-sm text-white">Nexus IA Core</span>
-                                <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded">OPERATIVO</span>
-                            </div>
                         </div>
                     </div>
 

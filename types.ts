@@ -72,6 +72,15 @@ export interface SpaceXLaunchpad {
 export interface SpaceXRocket {
   id: string;
   name: string;
+  description: string;
+  height: { meters: number; feet: number };
+  diameter: { meters: number; feet: number };
+  mass: { kg: number; lb: number }; // usually 'mass' is on specific variants, let's check API. standard API has mass in 'mass' property object for some, but typically it is 'mass' property. Let's assume standard structure: mass: { kg, lb }
+  stages: number;
+  success_rate_pct: number;
+  cost_per_launch: number;
+  flickr_images: string[];
+  active: boolean;
 }
 
 export interface NextLaunchData extends SpaceXLaunch {

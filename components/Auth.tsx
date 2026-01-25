@@ -48,7 +48,7 @@ export const Login: React.FC = () => {
             if (error) {
                 setError("Contraseña incorrecta.");
             } else {
-                navigate('/');
+                navigate('/dashboard');
             }
         } catch (err) {
             setError("Ocurrió un error inesperado.");
@@ -63,10 +63,10 @@ export const Login: React.FC = () => {
 
             <div className="relative z-10 w-full max-w-md p-8 bg-surface-dark/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-glow-lg">
                 <div className="text-center mb-8">
-                    <div className="size-16 mx-auto bg-primary/20 rounded-full flex items-center justify-center border border-primary/50 mb-4">
-                        <span className="material-symbols-outlined text-3xl text-primary">rocket_launch</span>
+                    <div className="size-20 mx-auto transition-transform duration-500 hover:rotate-12 mb-4">
+                        <img src="/isotipo.png" alt="Space Community Isotype" className="w-full h-full object-contain dark:brightness-100 brightness-0" />
                     </div>
-                    <h1 className="text-2xl font-serif font-bold text-white">SpaceX Nexus</h1>
+                    <h1 className="text-2xl font-serif font-bold !text-white">Space Community</h1>
                     <p className="text-slate-400 text-sm">Identificación de Personal</p>
                 </div>
 
@@ -145,6 +145,12 @@ export const Register: React.FC = () => {
                 return false;
             }
         }
+        if (currentStep === 2) {
+            if (!formData.avatar.trim()) {
+                setError('Por favor selecciona o introduce un avatar.');
+                return false;
+            }
+        }
         if (currentStep === 3) {
             if (!formData.bio.trim()) {
                 setError('Por favor completa tu biografía de misión.');
@@ -181,7 +187,7 @@ export const Register: React.FC = () => {
                     setError(error.message || "Error al registrarse");
                     setIsLoading(false);
                 } else {
-                    navigate('/');
+                    navigate('/dashboard');
                 }
             } catch (err) {
                 setError("Ocurrió un error inesperado");
@@ -199,11 +205,11 @@ export const Register: React.FC = () => {
                 {/* Progress Sidebar */}
                 <div className="hidden md:flex flex-col w-1/3 border-r border-white/5 pr-6 gap-8">
                     <div className="flex items-center gap-3">
-                        <div className="size-10 bg-primary/20 rounded-lg flex items-center justify-center border border-primary/50">
-                            <span className="material-symbols-outlined text-primary">rocket_launch</span>
+                        <div className="size-12 transition-transform duration-500 hover:rotate-12 shrink-0">
+                            <img src="/isotipo.png" alt="Space Community Isotype" className="w-full h-full object-contain dark:brightness-100 brightness-0" />
                         </div>
                         <div>
-                            <h2 className="text-white font-bold leading-tight">Registro de Vuelo</h2>
+                            <h2 className="text-white font-bold leading-tight !text-white">Registro de Vuelo</h2>
                             <p className="text-xs text-slate-500">Configuración Inicial</p>
                         </div>
                     </div>
@@ -301,7 +307,7 @@ export const Register: React.FC = () => {
 
                                 <div>
                                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Selecciona Avatar</label>
-                                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                                    <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                                         {AVATARS.map((avatar, idx) => (
                                             <div
                                                 key={idx}
@@ -320,18 +326,14 @@ export const Register: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Asignación de Rol</label>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {ROLES.map((role, idx) => (
-                                            <div
-                                                key={idx}
-                                                onClick={() => setFormData({ ...formData, role })}
-                                                className={`p-3 rounded-lg border cursor-pointer transition-all text-sm font-medium text-center ${formData.role === role ? 'bg-primary/20 border-primary text-white' : 'bg-surface-darker border-white/10 text-slate-400 hover:bg-white/5'}`}
-                                            >
-                                                {role}
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-primary">O introduce una URL personalizada</label>
+                                    <input
+                                        type="url"
+                                        value={AVATARS.includes(formData.avatar) ? '' : formData.avatar}
+                                        onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+                                        className="w-full bg-surface-darker border border-white/10 rounded-lg p-3 text-white focus:border-primary outline-none transition-all"
+                                        placeholder="https://ejemplo.com/mi-avatar.jpg"
+                                    />
                                 </div>
 
                                 <div className="mt-auto pt-4 flex gap-3">

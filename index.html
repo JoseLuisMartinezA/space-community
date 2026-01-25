@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>SpaceX Community Nexus</title>
+    <title>Space Community</title>
+    <link rel="icon" href="/isotipo.png" />
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect" />
@@ -24,25 +25,31 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#00d6cf",
+                        "primary": "#00d6cf", // Cyan
+                        "secondary": "#7c3aed", // Violet
+                        "success": "#10b981", // Green
                         "background-light": "#f9fafb",
-                        "background-dark": "#111117",
-                        "surface-dark": "#181820",
-                        "surface-darker": "#14141a",
-                        "accent-purple": "#6A0DAD",
-                        "accent-gold": "#B8860B",
+                        "background-dark": "#0B0E14", // Deep space dark
+                        "surface-dark": "#151A23",
+                        "surface-darker": "#0D1117",
+                        "accent-blue": "#3b82f6",
+                        "accent-purple": "#8b5cf6",
+                        "accent-green": "#10b981",
                     },
                     fontFamily: {
                         "display": ["Plus Jakarta Sans", "sans-serif"],
                         "serif": ["Noto Serif", "serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
                     },
-                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
                     boxShadow: {
-                        'glow': '0 0 15px rgba(0, 214, 207, 0.15)',
-                        'glow-lg': '0 0 30px rgba(0, 214, 207, 0.25)',
+                        'glow': '0 0 20px rgba(0, 214, 207, 0.2)',
+                        'glow-lg': '0 0 40px rgba(0, 214, 207, 0.3)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
                     },
                     backgroundImage: {
-                        'starfield': "radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%)",
+                        'space-gradient': "radial-gradient(circle at 50% 0%, #1a1b26 0%, #0B0E14 70%)",
+                        'nebula': "radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(0, 214, 207, 0.15) 0%, transparent 50%)",
                     }
                 },
             },
@@ -67,14 +74,45 @@
         }
 
         .light-theme .bg-background-dark {
-            background-color: #f9fafb !important;
-        }
-
-        .light-theme .bg-surface-dark {
             background-color: #ffffff !important;
         }
 
+        .light-theme .bg-surface-dark {
+            background-color: #f9fafb !important;
+        }
+
+        .light-theme header {
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            border-bottom-color: rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+        }
+
         .light-theme .bg-surface-darker {
+            background-color: #f3f4f6 !important;
+        }
+
+        /* Keep Login/Register Atmospheric */
+        .light-theme #root>div.min-h-screen.relative.overflow-hidden,
+        .light-theme #root>div.min-h-screen.relative.overflow-hidden>div.bg-surface-dark {
+            background-color: #151A23 !important;
+            color: white !important;
+        }
+
+        .light-theme #root>div.min-h-screen.relative.overflow-hidden input {
+            background-color: #0D1117 !important;
+            color: white !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .light-theme #root>div.min-h-screen.relative.overflow-hidden label {
+            color: #9ca3af !important;
+        }
+
+        .light-theme .bg-\[\#0f172a\]\/95 {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+
+        .light-theme .bg-\[\#11131f\] {
             background-color: #f3f4f6 !important;
         }
 
@@ -126,31 +164,59 @@
 
         /* Semantic Border Colors */
         .light-theme .border-surface-dark {
-            border-color: #ffffff !important;
+            border-color: #e5e7eb !important;
         }
 
         .light-theme .border-background-dark {
-            border-color: #f9fafb !important;
+            border-color: #f3f4f6 !important;
         }
 
         .light-theme .text-white {
-            color: #1f2937 !important;
-        }
-
-        .light-theme .hover\:text-white:hover {
             color: #111827 !important;
         }
 
+        .light-theme .hover\:text-white:hover {
+            color: #000000 !important;
+        }
+
+        .light-theme .text-slate-200 {
+            color: #1f2937 !important;
+        }
+
         .light-theme .text-slate-300 {
-            color: #4b5563 !important;
+            color: #374151 !important;
         }
 
         .light-theme .text-slate-400 {
-            color: #6b7280 !important;
+            color: #4b5563 !important;
         }
 
         .light-theme .text-slate-500 {
-            color: #9ca3af !important;
+            color: #6b7280 !important;
+        }
+
+        .light-theme .bg-black\/20 {
+            background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .light-theme .bg-black\/40 {
+            background-color: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .light-theme .bg-indigo-900\/50 {
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+
+        .light-theme .border-indigo-500\/20 {
+            border-color: rgba(59, 130, 246, 0.2) !important;
+        }
+
+        .light-theme .text-white\/60 {
+            color: rgba(0, 0, 0, 0.6) !important;
+        }
+
+        .light-theme .text-indigo-100 {
+            color: #1e1b4b !important;
         }
 
         .light-theme .border-white\/5,
@@ -160,6 +226,64 @@
 
         .light-theme .border-white\/20 {
             border-color: rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .light-theme .shadow-glow {
+            box-shadow: 0 0 20px rgba(0, 214, 207, 0.1);
+        }
+
+        .light-theme .bg-surface-darker\/50 {
+            background-color: rgba(0, 0, 0, 0.03) !important;
+        }
+
+        .light-theme header {
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .light-theme header nav {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+            border: 1px solid rgba(0, 0, 0, 0.03) !important;
+        }
+
+        .light-theme .shadow-glow {
+            box-shadow: 0 0 20px rgba(0, 214, 207, 0.15) !important;
+        }
+
+        .light-theme .text-primary {
+            color: #0c4a6e !important;
+            /* Dark Blue for better contrast on white */
+        }
+
+        .light-theme .bg-space-gradient {
+            background: radial-gradient(circle at 50% 0%, rgba(0, 214, 207, 0.1) 0%, transparent 80%) !important;
+        }
+
+        .light-theme .bg-nebula {
+            opacity: 0.1 !important;
+        }
+
+        /* Make Landing Page Hero H1 readable in light mode */
+        .light-theme .bg-clip-text.text-transparent {
+            background-image: linear-gradient(to bottom, #111827, #374151) !important;
+            color: transparent !important;
+        }
+
+        .light-theme h1,
+        .light-theme h2,
+        .light-theme h3,
+        .light-theme h4 {
+            color: #111827 !important;
+        }
+
+        .light-theme .\!text-white {
+            color: #ffffff !important;
+        }
+
+        .light-theme .\!text-white\/90 {
+            color: rgba(255, 255, 255, 0.9) !important;
         }
 
         /* Custom scrollbar for light theme */
