@@ -8,7 +8,7 @@ const TechSupport: React.FC = () => {
                     <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                     Sistemas Nominales
                 </div>
-                <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">Centro de Soporte Nexus</h1>
+                <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">Centro de Soporte Space Community</h1>
                 <p className="text-slate-400 max-w-2xl mx-auto">
                     Asistencia técnica especializada para enlaces de telemetría, problemas de cuenta y consultas sobre la API.
                     Nuestros ingenieros de vuelo están disponibles 24/7.
@@ -38,8 +38,8 @@ const TechSupport: React.FC = () => {
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2">Enlace Subespacial</h3>
                         <p className="text-slate-400 text-sm mb-6">Para consultas generales, logs de errores y feedback.</p>
-                        <a href="mailto:soporte@nexus.space" className="text-lg text-white hover:text-primary transition-colors font-medium">
-                            soporte@nexus.space
+                        <a href="mailto:soporte@spacecommunity.com" className="text-lg text-white hover:text-primary transition-colors font-medium">
+                            soporte@spacecommunity.com
                         </a>
                         <span className="text-xs text-slate-500 block mt-2">Respuesta en 4-6 horas</span>
                     </div>

@@ -16,7 +16,7 @@ interface Friend {
 }
 
 const Profile: React.FC = () => {
-   const { user, updateProfile } = useAuth();
+   const { user, updateProfile, logout } = useAuth();
    const { theme, toggleTheme } = useTheme();
    const { notifications, clearAllNotifications, markAsRead } = useNotifications();
    const navigate = useNavigate();
@@ -24,6 +24,11 @@ const Profile: React.FC = () => {
    // UI State
    const [showSettings, setShowSettings] = useState(false);
    const [showNotificationsView, setShowNotificationsView] = useState(false);
+
+   const handleLogout = () => {
+      logout();
+      navigate('/login');
+   };
 
    // Real Data State
    const [friends, setFriends] = useState<Friend[]>([]);
@@ -405,7 +410,7 @@ const Profile: React.FC = () => {
                   <div className="bg-surface-dark border border-white/5 rounded-2xl p-6 shadow-lg animate-slideUp" style={{ animationDelay: '0.15s' }}>
                      <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                         <span className="material-symbols-outlined text-primary">person_search</span>
-                        Añadir Aliados
+                        Añadir Amigos
                      </h3>
                      <div className="relative mb-4">
                         <input
@@ -448,7 +453,7 @@ const Profile: React.FC = () => {
                <div className="lg:col-span-2 space-y-6">
                   {/* My Posts */}
                   <div className="bg-surface-dark border border-white/5 rounded-2xl p-6 shadow-lg animate-slideUp" style={{ animationDelay: '0.2s' }}>
-                     <h3 className="text-xl font-serif font-bold text-white mb-6">Mis Publicaciones</h3>
+                     <h3 className="text-xl font-serif font-bold text-white mb-6">Mi última publicación</h3>
 
                      {latestPost ? (
                         <div className="bg-surface-darker/30 rounded-2xl p-6 border border-black/5 dark:border-white/5 hover:border-primary/30 transition-all cursor-pointer group" onClick={() => navigate('/community')}>
@@ -501,12 +506,12 @@ const Profile: React.FC = () => {
          <div className="p-4 md:p-8 container mx-auto">
             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                <span className="material-symbols-outlined text-primary">group</span>
-               Mis Aliados <span className="text-slate-500 text-sm font-normal">({friends.length})</span>
+               Mis Amigos <span className="text-slate-500 text-sm font-normal">({friends.length})</span>
             </h2>
 
             {friends.length === 0 ? (
                <div className="text-center py-12 border border-dashed border-white/10 rounded-xl bg-surface-dark/50">
-                  <p className="text-slate-400">Aún no tienes aliados en tu red.</p>
+                  <p className="text-slate-400">Aún no tienes amigos en tu red.</p>
                </div>
             ) : (
                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -609,9 +614,12 @@ const Profile: React.FC = () => {
                   </section>
 
                   <div className="pt-10">
-                     <button className="w-full py-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl font-bold flex items-center justify-center gap-2">
+                     <button
+                        onClick={handleLogout}
+                        className="w-full py-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl font-bold flex items-center justify-center gap-2"
+                     >
                         <span className="material-symbols-outlined">logout</span>
-                        Cerrar Sesión Galáctica
+                        Cerrar Sesión
                      </button>
                   </div>
                </div>

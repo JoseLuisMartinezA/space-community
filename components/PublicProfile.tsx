@@ -148,7 +148,7 @@ export const PublicProfile: React.FC = () => {
 
         // If they are friends, warn that unfollowing breaks the friendship
         if (friendStatus === 'accepted') {
-            if (!window.confirm("Si dejas de seguir a este usuario, la alianza (amistad) se romperá automáticamente. ¿Continuar?")) return;
+            if (!window.confirm("Si dejas de seguir a este usuario, la amistad se romperá automáticamente. ¿Continuar?")) return;
         }
 
         const { error } = await supabase
@@ -206,7 +206,7 @@ export const PublicProfile: React.FC = () => {
     const handleRemoveFriend = async () => {
         if (!currentUser || !profile) return;
 
-        if (!window.confirm("¿Seguro que quieres romper la alianza con este usuario?")) return;
+        if (!window.confirm("¿Seguro que quieres romper la amistad con este usuario?")) return;
 
         const { error } = await supabase
             .from('friend_requests')
@@ -284,7 +284,7 @@ export const PublicProfile: React.FC = () => {
                                 {(friendStatus === 'none' || friendStatus === 'rejected') && (
                                     <button onClick={sendFriendRequest} className="px-6 py-3 bg-primary text-background-dark font-bold rounded-2xl hover:bg-white transition-all shadow-glow hover:shadow-glow-lg flex items-center gap-2">
                                         <span className="material-symbols-outlined font-bold">handshake</span>
-                                        {friendStatus === 'rejected' ? 'Reintentar Alianza' : 'Solicitar Alianza'}
+                                        {friendStatus === 'rejected' ? 'Reintentar Amistad' : 'Solicitar Amistad'}
                                     </button>
                                 )}
                                 {friendStatus === 'pending' && (
@@ -297,12 +297,12 @@ export const PublicProfile: React.FC = () => {
                                     <div className="flex gap-3">
                                         <div className="px-6 py-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-2xl flex items-center gap-2 cursor-default backdrop-blur-sm">
                                             <span className="material-symbols-outlined font-bold">shield_with_heart</span>
-                                            Aliados
+                                            Amigos
                                         </div>
                                         <button onClick={() => setShowMessageModal(true)} className="size-12 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all flex items-center justify-center">
                                             <span className="material-symbols-outlined">chat</span>
                                         </button>
-                                        <button onClick={handleRemoveFriend} className="size-12 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 rounded-2xl transition-all flex items-center justify-center text-red-400" title="Romper Alianza">
+                                        <button onClick={handleRemoveFriend} className="size-12 bg-red-500/5 hover:bg-red-500/10 border border-red-500/20 rounded-2xl transition-all flex items-center justify-center text-red-400" title="Romper Amistad">
                                             <span className="material-symbols-outlined">link_off</span>
                                         </button>
                                     </div>
@@ -345,7 +345,7 @@ export const PublicProfile: React.FC = () => {
                             </div>
                             <div className="bg-surface-dark border border-white/5 rounded-2xl p-4 text-center">
                                 <p className="text-2xl font-serif font-bold text-white">{friends.length}</p>
-                                <p className="text-[10px] text-slate-500 uppercase tracking-wider">Aliados</p>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-wider">Amigos</p>
                             </div>
                         </div>
                     </div>
@@ -366,7 +366,7 @@ export const PublicProfile: React.FC = () => {
                                 className={`px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'friends' ? 'bg-primary text-background-dark' : 'text-slate-400 hover:text-white'}`}
                             >
                                 <span className="material-symbols-outlined text-[18px]">group</span>
-                                Red de Alianzas
+                                Red de Amigos
                             </button>
                         </div>
 
@@ -406,7 +406,7 @@ export const PublicProfile: React.FC = () => {
                                     {friends.length === 0 ? (
                                         <div className="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 bg-surface-dark/40 rounded-3xl border border-white/5 border-dashed">
                                             <span className="material-symbols-outlined text-5xl opacity-20 mb-3">safety_divider</span>
-                                            <p className="text-sm font-medium">Este explorador aún no ha formado alianzas.</p>
+                                            <p className="text-sm font-medium">Este explorador aún no ha formado amistades.</p>
                                         </div>
                                     ) : (
                                         friends.map((friend) => (

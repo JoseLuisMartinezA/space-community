@@ -51,7 +51,7 @@ export const LandingPage: React.FC = () => {
             <main className="relative z-10 pt-20 pb-32 px-6 md:px-12 max-w-7xl mx-auto text-center">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-primary mb-8 animate-slideUp">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                    NEXUS LINK ESTABLISHED
+                    SPACE LINK ESTABLISHED
                 </div>
 
                 <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 animate-slideUp" style={{ animationDelay: '0.1s' }}>

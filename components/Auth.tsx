@@ -58,8 +58,13 @@ export const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-background-dark relative overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-background-dark relative overflow-hidden p-6 md:p-0">
             <div className="absolute inset-0 bg-[url('https://lh3.googleusercontent.com/aida-public/AB6AXuDkps8EaHx_S4AmVmMeWq0mOMytCPtfRKSBtGh7dKlGHw8rH8V8_ch2SpY7MKnFDoyDWnWqRbCE0EP4nxOIk_lcKBW5ytP-1fplvC-lOaluPXeOnyodU25T1CQMiC54VttTnCMggS8ajU1rNh4deuklpAJMmYA8EQ3yEZhyiVKXJxKQB_Py3Dz9SEtAZh_Wczu9YCSLI3RD7Cwg4e0FIkSrenDiSgVsQlc-TNvcxQkJmcBvv0xklg80o5HcAoUEfEge8YdL1BoLgVM')] bg-cover bg-center opacity-20"></div>
+
+            {/* Back Button */}
+            <Link to="/" className="absolute top-6 left-6 z-50 size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-primary hover:bg-white/10 transition-all">
+                <span className="material-symbols-outlined">arrow_back</span>
+            </Link>
 
             <div className="relative z-10 w-full max-w-md p-8 bg-surface-dark/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-glow-lg">
                 <div className="text-center mb-8">
@@ -104,7 +109,7 @@ export const Login: React.FC = () => {
 
                 <div className="mt-6 text-center">
                     <p className="text-slate-500 text-sm">
-                        ¿Primera vez aquí? <Link to="/register" className="text-primary hover:underline">Solicitar Permisos (Registro)</Link>
+                        ¿No tengo cuenta? <Link to="/register" className="text-primary font-bold hover:underline ml-1">Registrarme</Link>
                     </p>
                 </div>
             </div>
@@ -197,8 +202,13 @@ export const Register: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-background-dark relative overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-background-dark relative overflow-hidden p-6 md:p-0">
             <div className="absolute inset-0 bg-[url('https://lh3.googleusercontent.com/aida-public/AB6AXuDkps8EaHx_S4AmVmMeWq0mOMytCPtfRKSBtGh7dKlGHw8rH8V8_ch2SpY7MKnFDoyDWnWqRbCE0EP4nxOIk_lcKBW5ytP-1fplvC-lOaluPXeOnyodU25T1CQMiC54VttTnCMggS8ajU1rNh4deuklpAJMmYA8EQ3yEZhyiVKXJxKQB_Py3Dz9SEtAZh_Wczu9YCSLI3RD7Cwg4e0FIkSrenDiSgVsQlc-TNvcxQkJmcBvv0xklg80o5HcAoUEfEge8YdL1BoLgVM')] bg-cover bg-center opacity-20"></div>
+
+            {/* Back Button */}
+            <Link to="/" className="absolute top-6 left-6 z-50 size-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-primary hover:bg-white/10 transition-all">
+                <span className="material-symbols-outlined">arrow_back</span>
+            </Link>
 
             <div className="relative z-10 w-full max-w-2xl p-8 bg-surface-dark/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-glow-lg flex flex-col md:flex-row overflow-hidden">
 
@@ -232,7 +242,7 @@ export const Register: React.FC = () => {
 
                     <div className="mt-auto">
                         <p className="text-xs text-slate-500">¿Ya tienes cuenta?</p>
-                        <Link to="/login" className="text-primary text-sm font-bold hover:underline">Acceder al Sistema</Link>
+                        <Link to="/login" className="text-primary text-sm font-bold hover:underline">Iniciar Sesión</Link>
                     </div>
                 </div>
 
@@ -244,7 +254,7 @@ export const Register: React.FC = () => {
                                 <h3 className="text-xl font-serif font-bold text-white mb-2">Identificación</h3>
                                 <div className="flex flex-col gap-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nombre de Aplicación (Visible)</label>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nombre</label>
                                         <input
                                             type="text"
                                             required
@@ -256,7 +266,7 @@ export const Register: React.FC = () => {
                                         <p className="text-[10px] text-slate-500 mt-1">Este es el nombre que verán los demás usuarios sobre tu @handle.</p>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nombre de Usuario (Único)</label>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Usuario</label>
                                         <div className="relative">
                                             <span className="absolute left-3 top-3 text-slate-500 font-mono">@</span>
                                             <input
@@ -291,12 +301,12 @@ export const Register: React.FC = () => {
                                         className="w-full bg-surface-darker border border-white/10 rounded-lg p-3 text-white focus:border-primary outline-none"
                                         placeholder="••••••••"
                                     />
-                                </div>
-                                <div className="mt-auto pt-6 flex flex-col gap-3">
-                                    {error && <p className="text-red-400 text-xs">{error}</p>}
-                                    <button type="button" onClick={nextStep} className="w-full py-3 bg-primary text-background-dark font-bold rounded-lg hover:bg-white transition-colors uppercase tracking-wide text-sm">
-                                        Siguiente Fase
-                                    </button>
+                                    <div className="mt-auto pt-6 flex flex-col gap-3">
+                                        {error && <p className="text-red-400 text-xs">{error}</p>}
+                                        <button type="button" onClick={nextStep} className="w-full py-3 bg-primary text-background-dark font-bold rounded-lg hover:bg-white transition-colors uppercase tracking-wide text-sm">
+                                            Siguiente Fase
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -365,7 +375,7 @@ export const Register: React.FC = () => {
                                             Nota del Sistema
                                         </h4>
                                         <p className="text-[10px] text-slate-400">
-                                            Al iniciar el protocolo de ingreso, aceptas los términos de servicio de la red Nexus y los protocolos de comunicación interestelar.
+                                            Al iniciar el protocolo de ingreso, aceptas los términos de servicio de la red Space Community y los protocolos de comunicación interestelar.
                                         </p>
                                     </div>
                                 </div>
@@ -383,9 +393,16 @@ export const Register: React.FC = () => {
                                 </div>
                             </div>
                         )}
+
+                        {/* Global Mobile Login Link */}
+                        <div className="mt-8 text-center md:hidden border-t border-white/5 pt-6">
+                            <p className="text-slate-500 text-sm">
+                                ¿Tengo cuenta? <Link to="/login" className="text-primary font-bold hover:underline ml-1">Iniciar Sesión</Link>
+                            </p>
+                        </div>
                     </form>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };

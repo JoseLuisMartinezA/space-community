@@ -314,7 +314,7 @@ const Chat: React.FC = () => {
                 <div className="bg-surface-dark border border-white/5 rounded-xl flex flex-col overflow-hidden flex-1 min-h-0 shadow-2xl">
                     <div className="p-4 border-b border-white/5 flex justify-between items-center bg-surface-darker/50">
                         <h3 className="text-white font-bold text-sm uppercase tracking-wider">Enlace de Comms</h3>
-                        <span className="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold self-start">{friends.length} Aliados</span>
+                        <span className="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold self-start">{friends.length} Amigos</span>
                     </div>
                     <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                         {friends.length === 0 ? (
@@ -325,7 +325,7 @@ const Chat: React.FC = () => {
                             </div>
                         ) : searchQuery.trim() !== '' && filteredFriends.length === 0 ? (
                             <div className="text-center p-8 text-slate-500 text-xs italic">
-                                <p>No se encontraron aliados con ese nombre.</p>
+                                <p>No se encontraron amigos con ese nombre.</p>
                             </div>
                         ) : (
                             (searchQuery.trim() === '' ? friends : filteredFriends).map(friend => (
@@ -445,14 +445,14 @@ const Chat: React.FC = () => {
                             </div>
                             <h2 className="text-2xl font-bold text-white mb-2">Comunicaciones Seguras</h2>
                             <p className="text-slate-400 max-w-md">
-                                Inicia una transmisión encriptada con tus aliados. Selecciona un contacto de la lista para comenzar.
+                                Inicia una transmisión encriptada con tus amigos. Selecciona un contacto de la lista para comenzar.
                             </p>
                         </div>
 
                         <div className="p-6 text-center border-t border-white/5 bg-surface-darker/30">
                             <p className="text-slate-500 text-sm font-mono flex items-center justify-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                                Selecciona un aliado para abrir un canal privado.
+                                Selecciona un amigo para abrir un canal privado.
                             </p>
                         </div>
                     </div>

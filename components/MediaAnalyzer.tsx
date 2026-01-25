@@ -39,14 +39,14 @@ export const MediaAnalyzer: React.FC = () => {
                 const base64String = reader.result as string;
                 // Remove data url prefix (e.g. "data:image/jpeg;base64,")
                 const base64Data = base64String.split(',')[1];
-                
+
                 try {
-                   const analysisResult = await analyzeMedia(base64Data, file.type, "");
-                   setResult(analysisResult);
+                    const analysisResult = await analyzeMedia(base64Data, file.type, "");
+                    setResult(analysisResult);
                 } catch (err: any) {
-                   setError(err.message || "Fallo en la subida");
+                    setError(err.message || "Fallo en la subida");
                 } finally {
-                   setLoading(false);
+                    setLoading(false);
                 }
             };
             reader.onerror = () => {
@@ -65,14 +65,14 @@ export const MediaAnalyzer: React.FC = () => {
                 <h2 className="text-3xl text-white font-serif font-medium mb-2">Análisis de Telemetría Visual</h2>
                 <p className="text-slate-400 text-sm max-w-2xl">
                     Sube datos visuales (imágenes o clips de video cortos) de los sitios de lanzamiento o plantas de fabricación.
-                    Nexus IA analizará la integridad estructural, identificará componentes o resumirá eventos.
+                    Nuestra IA analizará la integridad estructural, identificará componentes o resumirá eventos.
                 </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Upload Section */}
                 <div className="flex flex-col gap-4">
-                    <div 
+                    <div
                         className={`border-2 border-dashed rounded-2xl h-64 flex flex-col items-center justify-center transition-all cursor-pointer relative overflow-hidden
                             ${file ? 'border-primary/50 bg-primary/5' : 'border-white/10 bg-surface-dark hover:border-white/30 hover:bg-white/5'}
                         `}
@@ -91,21 +91,21 @@ export const MediaAnalyzer: React.FC = () => {
                                 <span className="text-[10px] uppercase tracking-wider opacity-60">Imágenes o Video (Max 10MB)</span>
                             </div>
                         )}
-                        <input 
-                            type="file" 
-                            ref={fileInputRef} 
-                            onChange={handleFileChange} 
-                            accept="image/*,video/*" 
-                            className="hidden" 
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*,video/*"
+                            className="hidden"
                         />
                     </div>
 
-                    <button 
+                    <button
                         onClick={handleAnalysis}
                         disabled={!file || loading}
                         className={`w-full py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition-all
-                            ${!file || loading 
-                                ? 'bg-surface-dark text-slate-500 cursor-not-allowed' 
+                            ${!file || loading
+                                ? 'bg-surface-dark text-slate-500 cursor-not-allowed'
                                 : 'bg-primary text-[#111117] hover:bg-white shadow-glow'}
                         `}
                     >
@@ -116,7 +116,7 @@ export const MediaAnalyzer: React.FC = () => {
                             </span>
                         ) : "Iniciar Escaneo"}
                     </button>
-                    
+
                     {error && (
                         <div className="p-4 rounded-lg bg-red-900/20 border border-red-500/30 text-red-200 text-sm flex items-center gap-3">
                             <span className="material-symbols-outlined">warning</span>
@@ -134,7 +134,7 @@ export const MediaAnalyzer: React.FC = () => {
                             <span className="text-[10px] font-mono text-slate-500">{loading ? 'PROCESANDO' : result ? 'COMPLETO' : 'EN ESPERA'}</span>
                         </div>
                     </div>
-                    
+
                     <div className="flex-1 overflow-y-auto">
                         {loading ? (
                             <div className="space-y-3 animate-pulse">
