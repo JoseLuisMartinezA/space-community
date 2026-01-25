@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../services/supabase';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
+import { useNotifications } from '../context/NotificationContext';
 
 interface Friend {
    id: string; // This is the profile ID
@@ -15,10 +17,19 @@ interface Friend {
 
 const Profile: React.FC = () => {
    const { user, updateProfile } = useAuth();
+   const { theme, toggleTheme } = useTheme();
+   const { notifications, clearAllNotifications, markAsRead } = useNotifications();
    const navigate = useNavigate();
+
+   // UI State
+   const [showSettings, setShowSettings] = useState(false);
+   const [showNotificationsView, setShowNotificationsView] = useState(false);
 
    // Real Data State
    const [friends, setFriends] = useState<Friend[]>([]);
+   const [searchQuery, setSearchQuery] = useState('');
+   const [searchResults, setSearchResults] = useState<any[]>([]);
+   const [sendingRequestTo, setSendingRequestTo] = useState<string | null>(null);
 
    // Edit Profile State
    const [isEditing, setIsEditing] = useState(false);
@@ -164,6 +175,75 @@ const Profile: React.FC = () => {
       setIsEditing(false);
    };
 
+   const handleSearch = async (query: string) => {
+      setSearchQuery(query);
+      if (query.trim().length < 3) {
+         setSearchResults([]);
+         return;
+      }
+
+      const { data, error } = await supabase
+         .from('profiles')
+         .select('id, name, handle, avatar, bio')
+         .ilike('handle', `%${query}%`)
+         .neq('id', user?.id)
+         .limit(5);
+
+      if (!error && data) {
+         setSearchResults(data);
+      }
+   };
+
+   const handleAddFriend = async (targetUserId: string) => {
+      if (!user) return;
+      setSendingRequestTo(targetUserId);
+
+      try {
+         // 1. Check if already friends or request pending
+         const { data: existing } = await supabase
+            .from('friend_requests')
+            .select('*')
+            .or(`and(sender_id.eq.${user.id},receiver_id.eq.${targetUserId}),and(sender_id.eq.${targetUserId},receiver_id.eq.${user.id})`)
+            .single();
+
+         if (existing) {
+            alert("Ya existe una conexión o solicitud pendiente con este usuario.");
+            return;
+         }
+
+         // 2. Insert request
+         const { error } = await supabase
+            .from('friend_requests')
+            .insert({
+               sender_id: user.id,
+               receiver_id: targetUserId,
+               status: 'pending'
+            });
+
+         if (error) throw error;
+
+         // 3. Notify target
+         await supabase.from('notifications').insert({
+            user_id: targetUserId,
+            type: 'friend_request',
+            title: 'Nueva Solicitud',
+            content: `${user.handle} quiere establecer un enlace de comunicaciones contigo.`,
+            source_id: user.id,
+            source_handle: user.handle,
+            source_avatar: user.avatar
+         });
+
+         alert("Solicitud de alianza enviada correctamente.");
+         setSearchQuery('');
+         setSearchResults([]);
+      } catch (err: any) {
+         console.error("Error adding friend:", err);
+         alert("Error al enviar solicitud.");
+      } finally {
+         setSendingRequestTo(null);
+      }
+   };
+
    const getRelativeTime = (date: Date) => {
       const diff = Math.floor((new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
       if (diff === 0) return 'Hoy';
@@ -192,48 +272,12 @@ const Profile: React.FC = () => {
                      </div>
                   </div>
                   <div className="mb-2 flex-1">
-                     {isEditing ? (
-                        <div className="flex flex-col gap-2 max-w-xs relative z-50">
-                           <input
-                              type="text"
-                              value={editForm.name}
-                              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                              className="bg-surface-dark/80 border border-white/20 rounded px-2 py-1 text-white font-bold text-xl md:text-2xl outline-none focus:border-primary"
-                              placeholder="Nombre"
-                           />
-                           <input
-                              type="text"
-                              value={editForm.handle}
-                              onChange={(e) => setEditForm({ ...editForm, handle: e.target.value })}
-                              className="bg-surface-dark/80 border border-white/20 rounded px-2 py-1 text-primary font-mono text-sm outline-none focus:border-primary"
-                              placeholder="@usuario"
-                           />
-                        </div>
-                     ) : (
-                        <>
-                           <h1 className="text-3xl font-serif font-bold text-white">{user.name}</h1>
-                           <p className="text-primary font-mono text-sm">{user.handle}</p>
-                        </>
-                     )}
+                     <h1 className="text-3xl font-serif font-bold text-white">{user.name}</h1>
+                     <p className="text-primary font-mono text-sm">{user.handle}</p>
                   </div>
                </div>
 
-               <div className="hidden md:flex gap-4 mb-2 items-center">
-                  {isEditing ? (
-                     <div className="flex gap-2">
-                        <button onClick={() => setIsEditing(false)} className="bg-red-500/20 hover:bg-red-500/40 text-red-200 px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors">
-                           Cancelar
-                        </button>
-                        <button onClick={handleSaveProfile} className="bg-primary text-background-dark px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-white transition-colors">
-                           Guardar
-                        </button>
-                     </div>
-                  ) : (
-                     <button onClick={() => setIsEditing(true)} className="bg-primary text-background-dark px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wide hover:bg-white transition-colors">
-                        Editar Perfil
-                     </button>
-                  )}
-               </div>
+
             </div>
          </div>
 
@@ -264,13 +308,20 @@ const Profile: React.FC = () => {
                                  type="text"
                                  value={editForm.name}
                                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                 className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-primary"
+                                 className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white outline-none focus:border-primary text-sm"
                                  placeholder="Nombre Display"
+                              />
+                              <input
+                                 type="text"
+                                 value={editForm.handle}
+                                 onChange={(e) => setEditForm({ ...editForm, handle: e.target.value })}
+                                 className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-primary font-mono text-sm outline-none focus:border-primary"
+                                 placeholder="@usuario"
                               />
                               <textarea
                                  value={editForm.bio}
                                  onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                                 className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white/80 text-sm outline-none focus:border-primary h-20 resize-none"
+                                 className="w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-white/80 text-sm outline-none focus:border-primary h-20 resize-none font-sans"
                                  placeholder="Biografía breve..."
                               />
                               <div className="flex gap-2 justify-end">
@@ -298,13 +349,31 @@ const Profile: React.FC = () => {
                         )}
 
                         {!isEditing && (
-                           <button
-                              onClick={() => setIsEditing(true)}
-                              className="w-full py-2.5 bg-[#1d4ed8] hover:bg-[#1e40af] text-white rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2"
-                           >
-                              <span className="material-symbols-outlined text-lg">edit</span>
-                              Editar Perfil
-                           </button>
+                           <div className="flex flex-col gap-2">
+                              <button
+                                 onClick={() => setIsEditing(true)}
+                                 className="w-full py-2.5 bg-[#1d4ed8] hover:bg-[#1e40af] text-white rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2"
+                              >
+                                 <span className="material-symbols-outlined text-lg">edit</span>
+                                 Editar Perfil
+                              </button>
+                              <div className="grid grid-cols-2 gap-2 md:hidden">
+                                 <button
+                                    onClick={() => setShowSettings(true)}
+                                    className="py-2.5 bg-surface-darker hover:bg-white/5 border border-white/5 text-slate-300 rounded-lg font-medium text-xs transition-colors flex items-center justify-center gap-1.5"
+                                 >
+                                    <span className="material-symbols-outlined text-[18px]">settings</span>
+                                    Ajustes
+                                 </button>
+                                 <button
+                                    onClick={() => setShowNotificationsView(true)}
+                                    className="py-2.5 bg-surface-darker hover:bg-white/5 border border-white/5 text-slate-300 rounded-lg font-medium text-xs transition-colors flex items-center justify-center gap-1.5"
+                                 >
+                                    <span className="material-symbols-outlined text-[18px]">notifications</span>
+                                    Avisos
+                                 </button>
+                              </div>
+                           </div>
                         )}
                      </div>
                   </div>
@@ -329,6 +398,48 @@ const Profile: React.FC = () => {
                            <span className="text-slate-400 group-hover:text-white transition-colors">Comentarios</span>
                            <span className="text-yellow-400 font-bold text-xl">{stats.commentsReceived}</span>
                         </div>
+                     </div>
+                  </div>
+
+                  {/* Global Search / Add Friends */}
+                  <div className="bg-surface-dark border border-white/5 rounded-2xl p-6 shadow-lg animate-slideUp" style={{ animationDelay: '0.15s' }}>
+                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary">person_search</span>
+                        Añadir Aliados
+                     </h3>
+                     <div className="relative mb-4">
+                        <input
+                           type="text"
+                           value={searchQuery}
+                           onChange={(e) => handleSearch(e.target.value)}
+                           placeholder="Buscar por @usuario..."
+                           className="w-full bg-surface-darker border border-white/10 rounded-xl py-2.5 px-4 pl-10 text-white text-sm focus:border-primary outline-none transition-all"
+                        />
+                        <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-500">search</span>
+                     </div>
+
+                     <div className="space-y-3">
+                        {searchResults.map(res => (
+                           <div key={res.id} className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5 group">
+                              <img src={res.avatar} className="size-10 rounded-full object-cover" />
+                              <div className="flex-1 min-w-0">
+                                 <p className="text-sm font-bold text-white truncate">{res.name}</p>
+                                 <p className="text-[10px] text-primary font-mono">{res.handle}</p>
+                              </div>
+                              <button
+                                 onClick={() => handleAddFriend(res.id)}
+                                 disabled={sendingRequestTo === res.id}
+                                 className="size-8 rounded-full bg-primary/20 text-primary hover:bg-primary hover:text-black flex items-center justify-center transition-all disabled:opacity-50"
+                              >
+                                 <span className="material-symbols-outlined text-[20px]">
+                                    {sendingRequestTo === res.id ? 'sync' : 'person_add'}
+                                 </span>
+                              </button>
+                           </div>
+                        ))}
+                        {searchQuery.length >= 3 && searchResults.length === 0 && (
+                           <p className="text-center text-xs text-slate-500 py-2 italic font-serif">No se encontraron exploradores...</p>
+                        )}
                      </div>
                   </div>
                </div>
@@ -420,6 +531,129 @@ const Profile: React.FC = () => {
                </div>
             )}
          </div>
+
+         {/* Fullscreen Settings Modal */}
+         {showSettings && (
+            <div className="fixed inset-0 z-[100] bg-background-dark animate-slideUp overflow-y-auto">
+               <div className="sticky top-0 bg-surface-dark/80 backdrop-blur-md border-b border-white/10 p-4 flex items-center justify-between z-10">
+                  <div className="flex items-center gap-3">
+                     <button onClick={() => setShowSettings(false)} className="text-primary">
+                        <span className="material-symbols-outlined text-[32px]">chevron_left</span>
+                     </button>
+                     <h2 className="text-xl font-bold text-white">Configuración</h2>
+                  </div>
+               </div>
+
+               <div className="p-6 space-y-8">
+                  <section>
+                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Experiencia Visual</h3>
+                     <div className="bg-surface-dark border border-white/5 rounded-2xl p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                           <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-primary">
+                                 {theme === 'dark' ? 'dark_mode' : 'light_mode'}
+                              </span>
+                           </div>
+                           <div>
+                              <p className="font-bold text-white">Modo {theme === 'dark' ? 'Oscuro' : 'Claro'}</p>
+                              <p className="text-xs text-slate-400">Cambiar apariencia del sistema</p>
+                           </div>
+                        </div>
+                        <button
+                           onClick={toggleTheme}
+                           className={`relative w-14 h-7 rounded-full transition-colors ${theme === 'dark' ? 'bg-primary' : 'bg-slate-600'}`}
+                        >
+                           <div className={`absolute top-1 left-1 size-5 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-7' : 'translate-x-0'}`} />
+                        </button>
+                     </div>
+                  </section>
+
+                  <section>
+                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Notificaciones</h3>
+                     <div className="bg-surface-dark border border-white/5 rounded-2xl overflow-hidden divide-y divide-white/5">
+                        <div className="p-4 flex items-center justify-between">
+                           <div>
+                              <p className="font-bold text-white">Mensajes Directos</p>
+                              <p className="text-xs text-slate-400">Recibir alertas de nuevos chats</p>
+                           </div>
+                           <input type="checkbox" defaultChecked className="size-5 rounded border-white/10 bg-white/5 text-primary focus:ring-primary" />
+                        </div>
+                        <div className="p-4 flex items-center justify-between">
+                           <div>
+                              <p className="font-bold text-white">Lanzamientos en Vivo</p>
+                              <p className="text-xs text-slate-400">Notificar misiones espaciales</p>
+                           </div>
+                           <input type="checkbox" defaultChecked className="size-5 rounded border-white/10 bg-white/5 text-primary focus:ring-primary" />
+                        </div>
+                     </div>
+                  </section>
+
+                  <section>
+                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Cuenta</h3>
+                     <div className="bg-surface-dark border border-white/5 rounded-2xl overflow-hidden divide-y divide-white/5">
+                        <button className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                           <div className="flex items-center gap-3 text-slate-300">
+                              <span className="material-symbols-outlined">lock</span>
+                              <span>Seguridad</span>
+                           </div>
+                           <span className="material-symbols-outlined text-slate-600">chevron_right</span>
+                        </button>
+                        <button className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                           <div className="flex items-center gap-3 text-slate-300">
+                              <span className="material-symbols-outlined">language</span>
+                              <span>Idioma (Español)</span>
+                           </div>
+                           <span className="material-symbols-outlined text-slate-600">chevron_right</span>
+                        </button>
+                     </div>
+                  </section>
+
+                  <div className="pt-10">
+                     <button className="w-full py-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl font-bold flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined">logout</span>
+                        Cerrar Sesión Galáctica
+                     </button>
+                  </div>
+               </div>
+            </div>
+         )}
+
+         {/* Fullscreen Notifications Modal */}
+         {showNotificationsView && (
+            <div className="fixed inset-0 z-[100] bg-background-dark animate-slideUp overflow-y-auto">
+               <div className="sticky top-0 bg-surface-dark/80 backdrop-blur-md border-b border-white/10 p-4 flex items-center justify-between z-10">
+                  <div className="flex items-center gap-3">
+                     <button onClick={() => setShowNotificationsView(false)} className="text-primary">
+                        <span className="material-symbols-outlined text-[32px]">chevron_left</span>
+                     </button>
+                     <h2 className="text-xl font-bold text-white">Notificaciones</h2>
+                  </div>
+                  <button onClick={clearAllNotifications} className="text-xs text-primary font-bold uppercase">Limpiar</button>
+               </div>
+
+               <div className="p-4 space-y-2">
+                  {notifications.length === 0 ? (
+                     <div className="flex flex-col items-center justify-center py-20 text-slate-500 opacity-30">
+                        <span className="material-symbols-outlined text-8xl">notifications_off</span>
+                        <p className="mt-4 font-bold uppercase tracking-widest">Silencio Espacial</p>
+                     </div>
+                  ) : (
+                     notifications.map(n => (
+                        <div key={n.id} className="bg-surface-dark border border-white/5 rounded-2xl p-4 flex gap-4">
+                           <img src={n.source_avatar} className="size-12 rounded-full object-cover" />
+                           <div className="flex-1 min-w-0">
+                              <div className="flex justify-between">
+                                 <p className="font-bold text-white text-sm">{n.title}</p>
+                                 <span className="text-[10px] text-slate-500">{new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                              <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{n.content}</p>
+                           </div>
+                        </div>
+                     ))
+                  )}
+               </div>
+            </div>
+         )}
       </div>
    );
 };

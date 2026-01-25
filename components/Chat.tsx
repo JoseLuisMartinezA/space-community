@@ -182,21 +182,11 @@ const Chat: React.FC = () => {
     };
 
 
-    // Search
-    const handleSearch = async (query: string) => {
-        setSearchQuery(query);
-        if (query.length < 3) {
-            setSearchResults([]);
-            return;
-        }
-        const { data } = await supabase
-            .from('profiles')
-            .select('id, name, handle, avatar')
-            .ilike('handle', `%${query}%`)
-            .limit(5);
-
-        if (data) setSearchResults(data);
-    };
+    // Filter Friends locally
+    const filteredFriends = friends.filter(friend =>
+        friend.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        friend.handle.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     // Chat
     const fetchMessages = async (friendId: string) => {
@@ -272,14 +262,14 @@ const Chat: React.FC = () => {
     if (!user) return null;
 
     return (
-        <div className="flex h-full p-4 md:p-8 pt-4 gap-6 items-stretch animate-slideUp">
+        <div className="flex h-full p-0 md:p-8 pt-4 gap-6 items-stretch animate-slideUp">
 
-            {/* Left Col: Friends & Overview */}
-            <div className="w-80 md:w-96 flex flex-col gap-6 h-full overflow-hidden shrink-0">
+            {/* Left Col: Friends & Overview (Hidden on mobile when a friend is selected) */}
+            <div className={`${selectedFriend ? 'hidden md:flex' : 'flex'} w-full md:w-96 flex-col gap-6 h-full overflow-hidden shrink-0 transition-all duration-300 p-4 md:p-0`}>
 
                 {/* Requests Notification Card (Mobile/Inline) */}
                 {requests.length > 0 && (
-                    <div className="bg-surface-dark border border-primary/50 shadow-glow rounded-xl p-4">
+                    <div className="bg-surface-dark border border-primary/50 shadow-glow rounded-xl p-4 shrink-0">
                         <h3 className="text-primary font-bold text-sm uppercase mb-3 flex items-center gap-2">
                             <span className="material-symbols-outlined">person_add</span> Solicitudes Pendientes
                         </h3>
@@ -305,37 +295,19 @@ const Chat: React.FC = () => {
                     </div>
                 )}
 
-                {/* Search Users */}
-                <div className="bg-surface-dark border border-white/5 rounded-xl p-4 shadow-xl">
-                    <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-2">Búsqueda Global</h3>
+                {/* Search My Friends */}
+                <div className="bg-surface-dark border border-white/5 rounded-xl p-4 shadow-xl shrink-0">
+                    <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-2">Buscar Amigos</h3>
                     <div className="relative">
                         <input
                             type="text"
                             value={searchQuery}
-                            onChange={(e) => handleSearch(e.target.value)}
-                            placeholder="Buscar por nametag..."
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Buscar en mis contactos..."
                             className="w-full bg-surface-darker border border-white/10 rounded-lg py-2 px-3 pl-9 text-white text-sm focus:border-primary outline-none transition-all focus:shadow-[0_0_10px_rgba(0,214,207,0.1)]"
                         />
                         <span className="material-symbols-outlined absolute left-2 top-2 text-slate-500 text-[20px]">search</span>
                     </div>
-
-                    {searchResults.length > 0 && (
-                        <div className="mt-2 space-y-1">
-                            {searchResults.map(result => (
-                                <div
-                                    key={result.id}
-                                    onClick={() => navigate(`/profile/${result.id}`)}
-                                    className="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg cursor-pointer transition-colors"
-                                >
-                                    <img src={result.avatar} className="size-8 rounded-full" />
-                                    <div>
-                                        <p className="text-white text-sm font-bold">{result.name}</p>
-                                        <p className="text-primary text-xs">{result.handle.startsWith('@') ? result.handle : `@${result.handle}`}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
 
                 {/* Friends List */}
@@ -351,8 +323,12 @@ const Chat: React.FC = () => {
                                 <p>No hay conexiones activas.</p>
                                 <p>Busca usuarios para conectar.</p>
                             </div>
+                        ) : searchQuery.trim() !== '' && filteredFriends.length === 0 ? (
+                            <div className="text-center p-8 text-slate-500 text-xs italic">
+                                <p>No se encontraron aliados con ese nombre.</p>
+                            </div>
                         ) : (
-                            friends.map(friend => (
+                            (searchQuery.trim() === '' ? friends : filteredFriends).map(friend => (
                                 <button
                                     key={friend.id}
                                     onClick={() => setSelectedFriend(friend)}
@@ -372,11 +348,11 @@ const Chat: React.FC = () => {
                                                 {friend.name}
                                             </span>
                                             <div className="flex items-center gap-2">
-                                                {friend.unreadCount && friend.unreadCount > 0 && (
+                                                {friend.unreadCount && friend.unreadCount > 0 ? (
                                                     <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse shadow-glow-red">
                                                         {friend.unreadCount}
                                                     </span>
-                                                ) ? null : null}
+                                                ) : null}
                                             </div>
                                         </div>
                                         <p className="text-xs text-slate-500 truncate max-w-[150px] font-mono opacity-80">{friend.handle.startsWith('@') ? friend.handle : `@${friend.handle}`}</p>
@@ -388,14 +364,19 @@ const Chat: React.FC = () => {
                 </div>
             </div>
 
-            {/* Right Col: Chat or Stats */}
-            <div className="hidden md:flex flex-1 h-full bg-surface-dark border border-white/5 rounded-xl overflow-hidden relative shadow-2xl flex-col">
+            {/* Right Col: Chat (Fullscreen on mobile when friend selected) */}
+            <div className={`${selectedFriend ? 'flex' : 'hidden md:flex'} flex-1 h-full bg-surface-dark md:border border-white/5 md:rounded-xl overflow-hidden relative shadow-2xl flex-col`}>
 
                 {selectedFriend ? (
                     /* Chat Interface */
                     <>
                         <div className="p-4 border-b border-white/5 bg-surface-darker flex justify-between items-center shadow-lg z-10">
                             <div className="flex items-center gap-3">
+                                {/* Back Button Mobile */}
+                                <button onClick={() => setSelectedFriend(null)} className="md:hidden text-primary p-1 -ml-2">
+                                    <span className="material-symbols-outlined text-[28px]">chevron_left</span>
+                                </button>
+
                                 <div
                                     onClick={() => navigate(`/profile/${selectedFriend.id}`)}
                                     className="relative cursor-pointer group"
@@ -404,16 +385,16 @@ const Chat: React.FC = () => {
                                 </div>
                                 <div
                                     onClick={() => navigate(`/profile/${selectedFriend.id}`)}
-                                    className="cursor-pointer group"
+                                    className="cursor-pointer group min-w-0"
                                 >
-                                    <h3 className="text-white font-bold text-sm group-hover:text-primary transition-colors">{selectedFriend.name}</h3>
-                                    <p className="text-slate-400 text-xs flex items-center gap-1 font-mono">
+                                    <h3 className="text-white font-bold text-sm group-hover:text-primary transition-colors truncate">{selectedFriend.name}</h3>
+                                    <p className="text-slate-400 text-[10px] flex items-center gap-1 font-mono">
                                         <span className={`size-1.5 rounded-full ${selectedFriend.status === 'online' ? 'bg-emerald-500' : 'bg-slate-500'}`}></span>
                                         {selectedFriend.handle.startsWith('@') ? selectedFriend.handle : `@${selectedFriend.handle}`}
                                     </p>
                                 </div>
                             </div>
-                            <button onClick={() => setSelectedFriend(null)} className="text-slate-400 hover:text-white p-2 hover:bg-white/5 rounded-full transition-all">
+                            <button onClick={() => setSelectedFriend(null)} className="text-slate-400 hover:text-white p-2 hover:bg-white/5 rounded-full transition-all hidden md:block">
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
@@ -421,11 +402,11 @@ const Chat: React.FC = () => {
                         <div className="flex-1 overflow-y-auto p-4 gap-4 bg-[#111117]/50 flex flex-col-reverse scrollbar-thin scrollbar-thumb-white/10">
                             {[...chatHistory].reverse().map(msg => (
                                 <div key={msg.id} className={`flex ${msg.sender_id === user.id ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[75%] p-3 px-4 text-sm transition-all hover:scale-[1.01] ${msg.sender_id === user.id
+                                    <div className={`max-w-[85%] md:max-w-[75%] p-3 px-4 text-sm transition-all hover:scale-[1.01] ${msg.sender_id === user.id
                                         ? 'bg-[#00d6cf] text-black font-medium rounded-2xl rounded-tr-sm'
                                         : 'bg-surface-darker border border-white/10 text-slate-200 rounded-2xl rounded-tl-sm shadow-md backdrop-blur-sm'
                                         }`}>
-                                        <div className="leading-relaxed">{msg.content}</div>
+                                        <div className="leading-relaxed break-words">{msg.content}</div>
                                         <div className={`text-[10px] mt-1 text-right block font-mono ${msg.sender_id === user.id ? 'text-black/70 font-bold' : 'text-slate-500'}`}>
                                             {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
@@ -434,19 +415,19 @@ const Chat: React.FC = () => {
                             ))}
                         </div>
 
-                        <div className="p-4 bg-surface-darker border-t border-white/5 relative z-20">
+                        <div className="p-4 bg-surface-darker border-t border-white/5 relative z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
                             <div className="flex gap-2">
                                 <input
                                     type="text"
                                     value={messageInput}
                                     onChange={(e) => setMessageInput(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                                    placeholder={`Mensaje a @${selectedFriend.handle.replace('@', '')}...`}
-                                    className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary focus:bg-black/60 focus:ring-1 focus:ring-primary/50 outline-none transition-all placeholder:text-slate-500 hover:border-white/20"
+                                    placeholder="Mensaje..."
+                                    className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary focus:bg-black/60 focus:ring-1 focus:ring-primary/50 outline-none transition-all placeholder:text-slate-500"
                                 />
                                 <button
                                     onClick={handleSendMessage}
-                                    className="bg-primary/20 text-primary border border-primary/20 hover:bg-primary hover:text-[#111117] px-4 rounded-xl transition-all duration-300 flex items-center justify-center"
+                                    className="bg-primary text-[#111117] px-4 rounded-xl transition-all duration-300 flex items-center justify-center shadow-glow"
                                 >
                                     <span className="material-symbols-outlined">send</span>
                                 </button>
@@ -454,7 +435,7 @@ const Chat: React.FC = () => {
                         </div>
                     </>
                 ) : (
-                    /* Default Stats View - The "Metrics" from the image request */
+                    /* Default Stats View */
                     <div className="h-full flex flex-col relative overflow-hidden">
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none"></div>
 

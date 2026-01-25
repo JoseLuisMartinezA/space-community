@@ -79,7 +79,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     { to: '/launches', icon: 'rocket_launch', label: 'Lanzamientos' },
     { to: '/rockets', icon: 'flight_takeoff', label: 'Cohetes' },
     { to: '/statistics', icon: 'analytics', label: 'Estadísticas' },
-    { to: '/community', icon: 'search', label: 'Buscador' }, // Combined conceptual link
     { to: '/community', icon: 'forum', label: 'Comunidad' },
     { to: '/chat', icon: 'chat', label: 'Chat' },
     { to: '/profile', icon: 'person', label: 'Perfil' },
@@ -88,51 +87,52 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
     <div className="flex flex-col h-screen w-full bg-background-dark text-white overflow-hidden font-display relative selection:bg-primary/30">
 
-      {/* Top Navigation Bar */}
-      <header className="h-24 border-b border-white/5 bg-surface-dark/80 backdrop-blur-md flex items-center justify-between px-4 lg:px-8 z-50 fixed top-0 left-0 right-0 shadow-lg shadow-black/20">
+      {/* Top Navigation Bar - Hidden on Mobile */}
+      <header className="hidden md:flex h-16 border-b border-white/5 bg-surface-dark/80 backdrop-blur-md items-center justify-between px-4 lg:px-8 z-50 fixed top-0 left-0 right-0 shadow-lg shadow-black/20">
 
         {/* Brand */}
-        <Link to="/" className="flex items-center gap-2 group h-full overflow-hidden py-2">
+        <Link to="/" className="flex items-center gap-2 group h-full overflow-hidden py-1">
           <img
             src="/isotipo.png"
             alt="Space Community Icon"
-            className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-110 dark:brightness-100 brightness-0"
+            className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-110 dark:brightness-100 brightness-0"
           />
           <img
             src="/logotipo.png"
             alt="Space Community Logo"
-            className="h-8 w-auto object-contain hidden lg:block transition-all dark:brightness-100 brightness-0"
+            className="h-6 w-auto object-contain hidden lg:block transition-all dark:brightness-100 brightness-0"
           />
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1 bg-surface-darker/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm">
+        <nav className="flex items-center gap-1 bg-surface-darker/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm">
           {navLinks.map((link, index) => (
             <NavItem
               key={index}
               to={link.to}
               icon={link.icon}
               label={link.label}
-              active={location.pathname === link.to && link.label !== 'Buscador'} // Simple active check logic
+              active={location.pathname === link.to}
             />
           ))}
         </nav>
 
-        {/* User / Actions */}
+        {/* User / Actions (Desktop) */}
         <div className="flex items-center gap-4">
-          {/* Notification Button */}
+
+          {/* Notification Button (Desktop) */}
           <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className={`relative p-2 rounded-full transition-colors ${showNotifications ? 'text-white bg-white/10' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
             >
-              <span className="material-symbols-outlined">notifications</span>
-              {unreadCount > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse border border-surface-dark"></span>}
+              <span className="material-symbols-outlined text-[22px]">notifications</span>
+              {unreadCount > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse border border-surface-dark"></span>}
             </button>
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className="absolute top-12 right-0 w-80 bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-glow-lg z-50 overflow-hidden animate-slideUp">
+              <div className="absolute top-10 right-0 w-80 bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-glow-lg z-50 overflow-hidden animate-slideUp">
                 <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
                   <h3 className="text-sm font-bold text-white uppercase tracking-widest">Notificaciones</h3>
                   {notifications.length > 0 && (
@@ -156,16 +156,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       >
                         <div className="relative shrink-0">
                           <img src={notif.source_avatar} className="size-10 rounded-full object-cover" />
-                          <div className={`absolute -bottom-1 -right-1 size-5 rounded-full flex items-center justify-center border border-surface-dark ${notif.type === 'message' ? 'bg-blue-500' :
-                            notif.type === 'friend_request' ? 'bg-primary' : 'bg-emerald-500'
-                            }`}>
-                            <span className="material-symbols-outlined text-[12px] text-white">
-                              {notif.type === 'message' ? 'chat' :
-                                notif.type === 'friend_request' ? 'person_add' : 'check'}
-                            </span>
-                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 text-left">
                           <div className="flex justify-between items-start mb-0.5">
                             <p className="text-xs font-bold text-white truncate pr-2">{notif.title}</p>
                             <span className="text-[10px] text-slate-500 whitespace-nowrap">{getRelativeTime(notif.created_at)}</span>
@@ -178,176 +170,158 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   )}
                 </div>
                 <div className="p-3 bg-black/20 text-center">
-                  <Link to="/profile" onClick={() => setShowNotifications(false)} className="text-xs text-slate-400 hover:text-white transition-colors">Ver todo mi perfil</Link>
+                  <Link to="/profile" onClick={() => setShowNotifications(false)} className="text-xs text-slate-400 hover:text-white transition-colors font-bold uppercase tracking-tighter">Ver Perfil Completo</Link>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Settings Button */}
+          {/* Settings Button (Desktop) */}
           <div className="relative" ref={settingsRef}>
             <button
               onClick={() => setShowSettings(!showSettings)}
               className={`relative p-2 rounded-full transition-colors ${showSettings ? 'text-white bg-white/10' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
             >
-              <span className="material-symbols-outlined">settings</span>
+              <span className="material-symbols-outlined text-[22px]">settings</span>
             </button>
 
             {/* Settings Dropdown */}
             {showSettings && (
-              <div className="absolute top-12 right-0 w-72 bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-glow-lg z-50 overflow-hidden animate-slideUp">
-                <div className="p-4 border-b border-white/5 bg-white/5">
-                  <h3 className="text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px]">tune</span>
-                    Ajustes
+              <div className="absolute top-10 right-0 w-64 bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-xl shadow-glow-lg z-50 overflow-hidden animate-slideUp">
+                <div className="p-3 border-b border-white/5 bg-white/5">
+                  <h3 className="text-[11px] font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[16px]">tune</span>
+                    Ajustes de Sistema
                   </h3>
                 </div>
 
-                <div className="p-2">
+                <div className="p-1.5">
                   {/* Theme Toggle */}
-                  <div className="p-3 hover:bg-white/5 rounded-lg transition-colors">
-                    <div className="flex items-center justify-between mb-2">
+                  <div className="p-2.5 hover:bg-white/5 rounded-lg transition-colors">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-primary">
+                        <span className="material-symbols-outlined text-primary text-[20px]">
                           {theme === 'dark' ? 'dark_mode' : 'light_mode'}
                         </span>
                         <div>
-                          <p className="text-sm font-medium text-white">Tema</p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs font-medium text-white">Tema</p>
+                          <p className="text-[10px] text-slate-400">
                             {theme === 'dark' ? 'Modo Oscuro' : 'Modo Claro'}
                           </p>
                         </div>
                       </div>
                       <button
                         onClick={toggleTheme}
-                        className={`relative w-12 h-6 rounded-full transition-colors ${theme === 'dark' ? 'bg-primary' : 'bg-slate-600'}`}
+                        className={`relative w-10 h-5 rounded-full transition-colors ${theme === 'dark' ? 'bg-primary' : 'bg-slate-600'}`}
                       >
-                        <div className={`absolute top-0.5 left-0.5 size-5 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0'}`} />
+                        <div className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}`} />
                       </button>
                     </div>
                   </div>
 
+                  {/* Account / Profile Links */}
+                  <div className="border-t border-white/5 my-1.5"></div>
+
+                  <Link
+                    to="/profile"
+                    onClick={() => setShowSettings(false)}
+                    className="w-full p-2.5 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left group"
+                  >
+                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-[20px]">person_filled</span>
+                    <div>
+                      <p className="text-xs font-bold text-white uppercase tracking-tighter">Mi Perfil</p>
+                    </div>
+                  </Link>
+
                   {/* Other Settings Links */}
                   {[
-                    { icon: 'notifications', label: 'Notificaciones', sub: 'Gestionar preferencias' },
-                    { icon: 'language', label: 'Idioma', sub: 'Español' },
-                    { icon: 'shield', label: 'Privacidad', sub: 'Seguridad y datos' }
+                    { icon: 'notifications', label: 'Notificaciones', sub: 'Preferencias' },
+                    { icon: 'shield', label: 'Seguridad', sub: 'Cifrado' }
                   ].map((item, idx) => (
-                    <button key={idx} className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left">
-                      <span className="material-symbols-outlined text-slate-400">{item.icon}</span>
+                    <button key={idx} className="w-full p-2.5 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left text-slate-300">
+                      <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-white">{item.label}</p>
-                        <p className="text-xs text-slate-400">{item.sub}</p>
+                        <p className="text-xs font-medium">{item.label}</p>
+                        <p className="text-[10px] text-slate-500">{item.sub}</p>
                       </div>
-                      <span className="material-symbols-outlined text-slate-600 text-[18px]">chevron_right</span>
                     </button>
                   ))}
 
-                  <div className="border-t border-white/5 my-2"></div>
+                  <div className="border-t border-white/5 my-1.5"></div>
 
+                  {/* Logout Button */}
                   <button
-                    className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left"
-                    onClick={() => {
-                      setShowSettings(false);
-                      navigate('/profile');
-                    }}
+                    onClick={handleLogout}
+                    className="w-full p-2.5 hover:bg-red-500/10 rounded-lg transition-colors flex items-center gap-3 text-left group"
                   >
-                    <span className="material-symbols-outlined text-slate-400">person</span>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-white">Mi Cuenta</p>
-                      <p className="text-xs text-slate-400">Perfil y configuración</p>
-                    </div>
-                    <span className="material-symbols-outlined text-slate-600 text-[18px]">chevron_right</span>
+                    <span className="material-symbols-outlined text-slate-400 group-hover:text-red-500 transition-colors text-[20px]">logout</span>
+                    <span className="text-xs font-bold text-white group-hover:text-red-500">Cerrar Sesión</span>
                   </button>
-
-                  <button className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left">
-                    <span className="material-symbols-outlined text-slate-400">help</span>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-white">Ayuda y Soporte</p>
-                      <p className="text-xs text-slate-400">Centro de ayuda</p>
-                    </div>
-                    <span className="material-symbols-outlined text-slate-600 text-[18px]">chevron_right</span>
-                  </button>
-                </div>
-
-                <div className="p-3 bg-black/20 text-center border-t border-white/5">
-                  <p className="text-xs text-slate-500">Space Community v2.0.1</p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Profile Dropdown Trigger */}
-          <div className="flex items-center gap-3 pl-4 border-l border-white/10 relative" ref={profileRef}>
+          {/* Profile Direct Link (Desktop) */}
+          <div className="flex items-center gap-3 pl-4 border-l border-white/10 relative">
             <div className="text-right hidden lg:block">
               <div className="text-sm font-bold text-white leading-none">{user?.name || 'Invitado'}</div>
               <div className="text-[10px] text-primary">{user?.handle || '@usuario'}</div>
             </div>
-            <div
-              className={`size-9 rounded-full bg-slate-800 border overflow-hidden ring-2 ring-transparent transition-all cursor-pointer ${showProfileMenu ? 'border-primary ring-primary/30' : 'border-white/10 hover:border-white/30'}`}
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              title="Mi Cuenta"
+
+            <Link
+              to="/profile"
+              className="size-9 rounded-full bg-slate-800 border border-white/10 overflow-hidden hover:border-primary transition-all shadow-glow-sm"
+              title="Ir a mi perfil"
             >
               <img src={user?.avatar || "https://lh3.googleusercontent.com/aida-public/AB6AXuDhf0khbsYWHTkrFpFeDdlBNRfi37lS3Fi1BS3KPpqWJmuvr7rCac8ckcnuFkwGSbBo2Yk9UM_hOu1VqaOrIZtu2nV2VlDuCvo8wQRWEbTEoIMGpMwNlG5fFqIFcXgAss07QHxzTb1_286vyYamLpBzX94LVgzSJuM8KDe_zeH3zrjfYhw9xFlasibj89ITOeWuJIN-b6GUjkaqIhhUXOb7eGI5iE5LkhZXi2fDP3558Lbz7Ng1CwSYKVRb4idD1NAqjN6EGFybpRs"} className="w-full h-full object-cover" />
-            </div>
-
-            {/* Profile Dropdown Menu */}
-            {showProfileMenu && (
-              <div className="absolute top-12 right-0 w-48 bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-glow-lg z-50 overflow-hidden animate-slideUp">
-                <div className="p-2">
-                  <Link
-                    to="/profile"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="w-full p-3 hover:bg-white/5 rounded-lg transition-colors flex items-center gap-3 text-left group"
-                  >
-                    <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">person</span>
-                    <span className="text-sm font-medium text-white">Mi Perfil</span>
-                  </Link>
-                  <div className="border-t border-white/5 my-1"></div>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full p-3 hover:bg-red-500/10 rounded-lg transition-colors flex items-center gap-3 text-left group"
-                  >
-                    <span className="material-symbols-outlined text-slate-400 group-hover:text-red-500 transition-colors">logout</span>
-                    <span className="text-sm font-medium text-white group-hover:text-red-500 transition-colors">Cerrar Sesión</span>
-                  </button>
-                </div>
-              </div>
-            )}
+            </Link>
           </div>
 
-          {/* Mobile Menu Toggle */}
-          <button className="md:hidden text-slate-400" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            <span className="material-symbols-outlined">menu</span>
-          </button>
         </div>
       </header>
 
-      {/* Mobile Nav Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-background-dark/95 backdrop-blur-xl pt-24 px-6 md:hidden animate-slideUp">
-          <div className="flex flex-col gap-4">
-            {navLinks.map((link, index) => (
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-dark border-t border-white/10 flex items-center z-50 shadow-[0_-4px_30px_rgba(0,0,0,0.5)] safe-area-bottom">
+        {/* Scrollable Main Links */}
+        <div className="flex-1 flex items-center overflow-x-auto scrollbar-hide px-4 gap-8">
+          {navLinks.slice(0, -1).map((link, index) => {
+            const isActive = location.pathname === link.to;
+            return (
               <Link
                 key={index}
                 to={link.to}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-4 p-4 rounded-xl bg-surface-dark border border-white/5 text-slate-300 hover:bg-white/5 hover:text-primary transition-all"
+                className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 shrink-0 min-w-[60px] ${isActive ? 'text-primary' : 'text-slate-400'}`}
               >
-                <span className="material-symbols-outlined">{link.icon}</span>
-                <span className="text-lg font-medium">{link.label}</span>
+                <span className="material-symbols-outlined text-[24px]">{link.icon}</span>
+                <span className="text-[10px] font-medium uppercase tracking-tighter">{link.label}</span>
+                {isActive && <div className="w-1 h-1 bg-primary rounded-full shadow-[0_0_5px_#00d6cf]"></div>}
               </Link>
-            ))}
-            <button onClick={handleLogout} className="mt-8 w-full py-4 rounded-xl bg-red-500/10 text-red-500 font-bold border border-red-500/20 flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined">logout</span>
-              Cerrar Sesión
-            </button>
-          </div>
+            );
+          })}
         </div>
-      )}
+
+        {/* Fixed Profile Link */}
+        <div className="h-full flex items-center px-4 bg-surface-dark border-l border-white/10 shadow-[-10px_0_20px_rgba(0,0,0,0.3)]">
+          {navLinks.slice(-1).map((link, index) => {
+            const isActive = location.pathname === link.to;
+            return (
+              <Link
+                key={index}
+                to={link.to}
+                className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 ${isActive ? 'text-primary' : 'text-slate-400'}`}
+              >
+                <span className="material-symbols-outlined text-[24px]">{link.icon}</span>
+                <span className="text-[10px] font-medium uppercase tracking-tighter">{link.label}</span>
+                {isActive && <div className="w-1 h-1 bg-primary rounded-full shadow-[0_0_5px_#00d6cf]"></div>}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-full overflow-y-auto bg-transparent relative pt-24 scrollbar-hide z-0">
+      <main className="flex-1 flex flex-col h-full overflow-y-auto bg-transparent relative pt-0 md:pt-16 pb-20 md:pb-0 scrollbar-hide z-0">
         {children}
       </main>
 
