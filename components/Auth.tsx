@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../services/supabase';
@@ -133,6 +133,49 @@ export const Register: React.FC = () => {
         role: ROLES[0],
         avatar: AVATARS[0]
     });
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor selecciona un archivo de imagen válido.');
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert('La imagen es demasiado grande. Máximo 2MB.');
+            return;
+        }
+
+        setUploadingAvatar(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `temp-${Date.now()}.${fileExt}`;
+
+            const { error: uploadError, data } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: true
+                });
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(fileName);
+
+            setFormData({ ...formData, avatar: publicUrl });
+        } catch (error: any) {
+            console.error("Error uploading avatar:", error);
+            alert("Error al subir la imagen.");
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
 
     const validateStep = (currentStep: number) => {
         setError('');
@@ -336,14 +379,36 @@ export const Register: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-primary">O introduce una URL personalizada</label>
-                                    <input
-                                        type="url"
-                                        value={AVATARS.includes(formData.avatar) ? '' : formData.avatar}
-                                        onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                                        className="w-full bg-surface-darker border border-white/10 rounded-lg p-3 text-white focus:border-primary outline-none transition-all"
-                                        placeholder="https://ejemplo.com/mi-avatar.jpg"
-                                    />
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-primary">Sube tu propia foto o introduce una URL</label>
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={uploadingAvatar}
+                                            className="px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-white text-xs font-bold transition-all flex items-center gap-2 shrink-0 disabled:opacity-50"
+                                        >
+                                            {uploadingAvatar ? (
+                                                <span className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                            ) : (
+                                                <span className="material-symbols-outlined text-sm">upload</span>
+                                            )}
+                                            {uploadingAvatar ? 'Subiendo...' : 'Subir Foto'}
+                                        </button>
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleFileUpload}
+                                            accept="image/*"
+                                            className="hidden"
+                                        />
+                                        <input
+                                            type="url"
+                                            value={AVATARS.includes(formData.avatar) ? '' : formData.avatar}
+                                            onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+                                            className="flex-1 bg-surface-darker border border-white/10 rounded-lg p-3 text-white focus:border-primary outline-none transition-all text-sm"
+                                            placeholder="https://ejemplo.com/mi-avatar.jpg"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="mt-auto pt-4 flex gap-3">
