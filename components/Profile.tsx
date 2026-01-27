@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../services/supabase';
 import { useNavigate } from 'react-router-dom';
@@ -53,6 +53,8 @@ const Profile: React.FC = () => {
    });
    const [latestPost, setLatestPost] = useState<any>(null);
    const [activities, setActivities] = useState<any[]>([]);
+   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+   const fileInputRef = useRef<HTMLInputElement>(null);
 
    useEffect(() => {
       if (user) {
@@ -180,6 +182,68 @@ const Profile: React.FC = () => {
       setIsEditing(false);
    };
 
+   const handleAvatarClick = () => {
+      if (isEditing) {
+         fileInputRef.current?.click();
+      }
+   };
+
+   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !user) return;
+
+      // Basic validation
+      if (!file.type.startsWith('image/')) {
+         alert('Por favor selecciona un archivo de imagen válido.');
+         return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+         alert('La imagen es demasiado grande. Máximo 2MB.');
+         return;
+      }
+
+      setUploadingAvatar(true);
+      try {
+         const fileExt = file.name.split('.').pop();
+         const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+         const filePath = `avatars/${fileName}`;
+
+         // Attempt to upload to 'community' bucket (more likely to exist if general media is used)
+         // or 'avatars' bucket. I'll use 'avatars' as a standard.
+         const { error: uploadError, data } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, file, {
+               cacheControl: '3600',
+               upsert: true
+            });
+
+         if (uploadError) {
+            console.error("Upload error details:", uploadError);
+            throw uploadError;
+         }
+
+         // Get public URL
+         const { data: { publicUrl } } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(fileName);
+
+         console.log("Uploaded successfully, URL:", publicUrl);
+
+         // Update profile in AuthContext (which updates DB and state)
+         await updateProfile({ avatar: publicUrl });
+         
+         // Also update the local edit form if we want it to persist the change immediately
+         // but updateProfile already updates the user object which Profile uses for display.
+         
+      } catch (error: any) {
+         console.error("Error uploading avatar:", error);
+         alert("Error al subir la imagen. Asegúrate de que el almacenamiento esté configurado.");
+      } finally {
+         setUploadingAvatar(false);
+      }
+   };
+
    const handleSearch = async (query: string) => {
       setSearchQuery(query);
       if (query.trim().length < 3) {
@@ -268,14 +332,34 @@ const Profile: React.FC = () => {
 
             <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 flex items-end justify-between">
                <div className="flex items-end gap-6 w-full md:w-auto">
-                  <div className="relative">
-                     <div className="size-24 md:size-32 rounded-full p-1 bg-surface-dark border-2 border-primary/30 overflow-hidden">
-                        <img src={user.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
-                     </div>
-                     <div className="absolute bottom-2 right-2 size-6 bg-surface-dark rounded-full flex items-center justify-center border border-white/10">
-                        <span className="material-symbols-outlined text-sm text-primary">verified</span>
-                     </div>
-                  </div>
+                   <div className="relative">
+                      <div 
+                         className={`size-24 md:size-32 rounded-full p-1 bg-surface-dark border-2 border-primary/30 overflow-hidden relative ${isEditing ? 'cursor-pointer group' : ''}`}
+                         onClick={handleAvatarClick}
+                      >
+                         <img src={user.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                         {isEditing && (
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                               <span className="material-symbols-outlined text-white text-3xl">add_a_photo</span>
+                            </div>
+                         )}
+                         {uploadingAvatar && (
+                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                               <div className="size-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                         )}
+                      </div>
+                      <input 
+                         type="file" 
+                         ref={fileInputRef} 
+                         onChange={handleFileChange} 
+                         accept="image/*" 
+                         className="hidden" 
+                      />
+                      <div className="absolute bottom-2 right-2 size-6 bg-surface-dark rounded-full flex items-center justify-center border border-white/10">
+                         <span className="material-symbols-outlined text-sm text-primary">verified</span>
+                      </div>
+                   </div>
                   <div className="mb-2 flex-1">
                      <h1 className="text-3xl font-serif font-bold text-white">{user.name}</h1>
                      <p className="text-primary font-mono text-sm">{user.handle}</p>
@@ -294,14 +378,27 @@ const Profile: React.FC = () => {
                   {/* Profile Card */}
                   <div className="bg-surface-dark border border-white/5 rounded-2xl overflow-hidden shadow-lg animate-slideUp">
                      {/* Banner Area */}
-                     <div className="h-28 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 relative">
-                        <div className="absolute -bottom-12 left-6">
-                           <div className="size-24 rounded-full p-1 bg-surface-dark relative">
-                              <img src={user.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
-                              <div className="absolute bottom-1 right-1 size-4 bg-green-500 border-2 border-surface-dark rounded-full"></div>
-                           </div>
-                        </div>
-                     </div>
+                      <div className="h-28 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 relative">
+                         <div className="absolute -bottom-12 left-6">
+                            <div 
+                               className={`size-24 rounded-full p-1 bg-surface-dark relative ${isEditing ? 'cursor-pointer group' : ''}`}
+                               onClick={handleAvatarClick}
+                            >
+                               <img src={user.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                               {isEditing && (
+                                  <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                     <span className="material-symbols-outlined text-white">add_a_photo</span>
+                                  </div>
+                               )}
+                               {uploadingAvatar && (
+                                  <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
+                                     <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                  </div>
+                               )}
+                               <div className="absolute bottom-1 right-1 size-4 bg-green-500 border-2 border-surface-dark rounded-full"></div>
+                            </div>
+                         </div>
+                      </div>
 
                      {/* Profile Info */}
                      <div className="pt-14 p-6">
