@@ -152,27 +152,20 @@ export const Register: React.FC = () => {
 
         setUploadingAvatar(true);
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `temp-${Date.now()}.${fileExt}`;
-
-            const { error: uploadError, data } = await supabase.storage
-                .from('avatars')
-                .upload(fileName, file, {
-                    cacheControl: '3600',
-                    upsert: true
-                });
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(fileName);
-
-            setFormData({ ...formData, avatar: publicUrl });
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const base64String = reader.result as string;
+                setFormData({ ...formData, avatar: base64String });
+                setUploadingAvatar(false);
+            };
+            reader.onerror = () => {
+                alert("Error al leer el archivo.");
+                setUploadingAvatar(false);
+            };
         } catch (error: any) {
-            console.error("Error uploading avatar:", error);
-            alert("Error al subir la imagen.");
-        } finally {
+            console.error("Error processing image:", error);
+            alert("Error al procesar la imagen.");
             setUploadingAvatar(false);
         }
     };
