@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defensa Final - Space Community</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d6cf;
+            --secondary: #7c3aed;
+            --background: #0B0E14;
+            --surface: rgba(21, 26, 35, 0.8);
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Background effects */
+        .stars {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, #1a1b26 0%, #0B0E14 70%);
+            z-index: -1;
+        }
+
+        .nebula {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(0, 214, 207, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Slide Container */
+        .slides-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            position: relative;
+            text-align: center;
+        }
+
+        /* Slide Header */
+        .slide-header {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            opacity: 0.6;
+        }
+
+        .slide-header span {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* Content Styling */
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .accent-text {
+            color: var(--primary);
+        }
+
+        .content-box {
+            max-width: 1000px;
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            text-align: left;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            color: var(--text-dim);
+        }
+
+        li::before {
+            content: '→';
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        li b {
+            color: #fff;
+        }
+
+        /* Grid Layouts inside slides */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1100px;
+            text-align: left;
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 1024px) {
+            h1 {
+                font-size: 3.5rem;
+            }
+
+            h2 {
+                font-size: 2.5rem;
+            }
+
+            .content-box {
+                padding: 30px;
+            }
+
+            .grid-2 {
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .slide {
+                padding: 100px 20px 80px 20px;
+                height: auto;
+                min-height: 100vh;
+                justify-content: flex-start;
+            }
+
+            .slides-container {
+                flex-direction: column;
+                transform: none !important;
+                height: auto;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            h3 {
+                font-size: 1.2rem;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .slide-header {
+                top: 15px;
+                left: 20px;
+                right: 20px;
+                font-size: 0.7rem;
+            }
+
+            .nav-controls {
+                left: 0;
+                right: 0;
+                bottom: 0;
+                justify-content: center;
+                background: rgba(11, 14, 20, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 15px;
+                width: 100%;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                position: fixed;
+            }
+
+            li {
+                font-size: 1.1rem;
+            }
+
+            .content-box {
+                padding: 20px;
+                width: 100%;
+            }
+
+            .progress-bar {
+                top: 0;
+                bottom: auto;
+            }
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary);
+            color: var(--background);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+            z-index: 101;
+        }
+
+        /* Specific Elements */
+        .stats-badge {
+            background: rgba(0, 214, 207, 0.1);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .data-tag {
+            background: rgba(124, 58, 237, 0.2);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #d8b4fe;
+            margin-left: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        .active .fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stars"></div>
+    <div class="nebula"></div>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- SLIDE 1: PORTADA -->
+        <section class="slide">
+            <div class="stats-badge fade-in">FEBRERO 2026 | MISIÓN CUMPLIDA</div>
+            <h1 class="fade-in">SPACE <span class="accent-text">COMMUNITY</span></h1>
+            <h3 class="fade-in">Defensa de Proyecto Final de Grado</h3>
+            <p class="fade-in" style="font-size: 1.2rem; color: var(--text-dim); margin-top: 40px;">
+                Elias Maatalat | Ismael Franco | Jose Luis Martinez | Lucilene Vidal
+            </p>
+        </section>
+
+        <!-- SLIDE 2: EL PROBLEMA Y EL OBJETIVO -->
+        <section class="slide">
+            <div class="slide-header"><span>01. Introducción</span><span>Space Community</span></div>
+            <div class="grid-2">
+                <div class="content-box fade-in">
+                    <h3>El Problema</h3>
+                    <ul>
+                        <li><b>Información Dispersa:</b> Datos de SpaceX fragmentados en múltiples webs y redes
+                            sociales.</li>
+                        <li><b>Falta de comunidad técnica:</b> No existe un punto de encuentro social centrado en datos
+                            reales.</li>
+                        <li><b>Barrera de entrada:</b> Dificultad para visualizar telemetría histórica de forma
+                            intuitiva.</li>
+                    </ul>
+                </div>
+                <div class="content-box fade-in">
+                    <h3>El Objetivo</h3>
+                    <ul>
+                        <li><b>Centralizar:</b> Unificar lanzamientos, flota y telemetría en un solo Dashboard.</li>
+                        <li><b>Socializar:</b> Crear una red social funcional para entusiastas del sector.</li>
+                        <li><b>Interactuar:</b> Chat en tiempo real y foros de debate dinámicos.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: FUNCIONALIDAD (CAPACIDADES CORE) -->
+        <section class="slide">
+            <div class="slide-header"><span>02. Funcionalidad</span><span>Capacidades del Sistema</span></div>
+            <h2 class="fade-in">Ecosistema <span class="accent-text">Interconectado</span></h2>
+            <div class="grid-2 fade-in" style="max-width: 1200px;">
+                <div class="content-box">
+                    <h3>Misión (API SpaceX)</h3>
+                    <ul>
+                        <li><b>Dashboard:</b> Próxima misión con cuenta regresiva en vivo.</li>
+                        <li><b>Historial:</b> Buscador de misiones con filtros por éxito/año/pad.</li>
+                        <li><b>Flota:</b> Visualización de cohetes y sus especificaciones técnicas reales.</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Social (Comunidad)</h3>
+                    <ul>
+                        <li><b>Transmisiones:</b> Feed público con soporte multimedia (img/video).</li>
+                        <li><b>Comms Link:</b> Chat privado 1-a-1 solo entre aliados (amigos).</li>
+                        <li><b>Perfil:</b> Sistema de verificado, biografía y personalización.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: CASOS DE USO RELEVANTES -->
+        <section class="slide">
+            <div class="slide-header"><span>03. Casos de Uso</span><span>Interacción del Usuario</span></div>
+            <div class="content-box fade-in">
+                <h2>Experiencia de <span class="accent-text">Usuario</span></h2>
+                <ul style="margin-top: 30px;">
+                    <li><b>Analista de Datos:</b> Sigue el éxito de aterrizajes mediante gráficos de telemetría
+                        dinámica.</li>
+                    <li><b>Entusiasta Social:</b> Publica una foto del despliegue de Starlink en el feed y recibe
+                        feedback.</li>
+                    <li><b>Messenger Espacial:</b> Solicita amistad a un experto y debate por canal privado mediante
+                        chat real-time.</li>
+                    <li><b>Observador de Misión:</b> Consulta la ventana de lanzamiento y ubicación exacta del pad.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: MODELO DE DATOS -->
+        <section class="slide">
+            <div class="slide-header"><span>04. Ingeniería</span><span>Modelo de Interconexión</span></div>
+            <h2 class="fade-in">Modelo de <span class="accent-text">Datos Relacional</span></h2>
+            <div class="content-box fade-in"
+                style="font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; line-height: 1.8;">
+                <div
+                    style="border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; padding-bottom: 10px; color: var(--primary);">
+                    BASE DE DATOS: SUPABASE (POSTGRESQL)</div>
+                <div><b>profiles</b> <span class="data-tag">id, name, handle, avatar</span></div>
+                <div style="margin-left: 20px;">└─> <b>posts</b> <span class="data-tag">id, author_id, content,
+                        media</span></div>
+                <div style="margin-left: 40px;">└──> <b>comments</b> <span class="data-tag">id, post_id, author_id,
+                        text</span></div>
+                <div style="margin-left: 20px;">└─> <b>friend_requests</b> <span class="data-tag">sender_id,
+                        receiver_id, status</span></div>
+                <div style="margin-left: 40px;">└──> <b>messages</b> <span class="data-tag">sender_id, receiver_id,
+                        content</span></div>
+                <div style="margin-top: 20px; color: var(--text-dim);">* Integración Realtime v2 para sincronización
+                    instantánea de chat.</div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: PLANIFICACIÓN Y CRONOGRAMA -->
+        <section class="slide">
+            <div class="slide-header"><span>05. Misión</span><span>Cronograma de Despegue</span></div>
+            <div class="grid-2 fade-in">
+                <div class="content-box">
+                    <h3>Fases del Proyecto</h3>
+                    <ul style="font-size: 1.1rem;">
+                        <li><b>Diseño (S1-S3):</b> Design System, Prototipado en Figma.</li>
+                        <li><b>Core (S4-S7):</b> Integración API SpaceX y Database.</li>
+                        <li><b>Social (S8-S10):</b> Feed, Chat Real-time y Alianzas.</li>
+                        <li><b>Test (S11-S12):</b> QA, Bugfixing y Despliegue.</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Hitos Alcanzados</h3>
+                    <ul style="font-size: 1.1rem;">
+                        <li>Protocolo de Auth seguro.</li>
+                        <li>Latencia en chat inferior a 100ms.</li>
+                        <li>Sincronización 1:1 con API SpaceX.</li>
+                        <li>Diseño 100% Responsive Adaptive.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: RECURSOS Y JUSTIFICACIÓN -->
+        <section id="slide-resources" class="slide">
+            <div class="slide-header"><span>06. Logística</span><span>Equipo y Stack</span></div>
+            <div class="grid-2 fade-in">
+                <div class="content-box" style="background: rgba(0, 214, 207, 0.05);">
+                    <h3>Stack Tecnológico</h3>
+                    <ul>
+                        <li><b>Frontend:</b> React 19 + TypeScript.</li>
+                        <li><b>Estilos:</b> Tailwind CSS (Eficiencia).</li>
+                        <li><b>BaaS/DB:</b> Supabase (Escalabilidad).</li>
+                        <li><b>Charts:</b> Recharts (Análisis).</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Equipo Humano</h3>
+                    <ul>
+                        <li><b>Dev & Arquitecto:</b> Jose Luis M.</li>
+                        <li><b>Fullstack Comms:</b> Elias M.</li>
+                        <li><b>Frontend UX:</b> Ismael F.</li>
+                        <li><b>QA & Lead Design:</b> Lucilene V.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: RESUMEN ECONÓMICO -->
+        <section class="slide">
+            <div class="slide-header"><span>07. Economía</span><span>Análisis Financiero</span></div>
+            <div class="content-box fade-in" style="width: 100%;">
+                <h2 style="text-align: center;">Inversión Total: <span class="accent-text">€28.400</span></h2>
+                <div class="grid-2" style="margin-top: 40px;">
+                    <div>
+                        <h3>Desglose</h3>
+                        <ul>
+                            <li>Recursos Humanos: <b>€25.000</b></li>
+                            <li>Infraestructura Cloud: <b>€1.200</b></li>
+                            <li>Licencias y Marketing: <b>€2.200</b></li>
+                        </ul>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px;">
+                        <h3>Análisis ROI</h3>
+                        <p style="font-size: 1.1rem; color: var(--text-dim);">Proyecto de alta viabilidad. Costes
+                            operativos bajos gracias al stack Serverless, permitiendo un escalado masivo con inversión
+                            mínima en mantenimiento.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: RIESGOS Y GESTIÓN -->
+        <section class="slide">
+            <div class="slide-header"><span>08. Control</span><span>Gestión de Contingencias</span></div>
+            <div class="grid-2 fade-in">
+                <div class="content-box" style="border-left: 4px solid #ef4444;">
+                    <h3>Riesgo Externo</h3>
+                    <p><b>API SpaceX Offline:</b> Pérdida de datos en vivo.</p>
+                    <p style="margin-top: 10px; color: var(--primary);"><b>Solución:</b> Caché híbrida inteligente y
+                        LocalStorage persistente.</p>
+                </div>
+                <div class="content-box" style="border-left: 4px solid #f59e0b;">
+                    <h3>Riesgo Técnico</h3>
+                    <p><b>Concurrencia en Chat:</b> Sobrecarga de sockets.</p>
+                    <p style="margin-top: 10px; color: var(--primary);"><b>Solución:</b> Canales optimizados en Supabase
+                        Realtime v2.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: CONCLUSIÓN Y VIABILIDAD -->
+        <section class="slide">
+            <div class="slide-header"><span>09. Cierre</span><span>Consideraciones Finales</span></div>
+            <div class="content-box fade-in" style="text-align: center;">
+                <h2>Proyecto <span class="accent-text">Viable y Escalable</span></h2>
+                <p style="font-size: 1.4rem; margin-top: 30px; color: var(--text-dim);">
+                    "Space Community no es solo un visualizador, es el centro neurálgico para la siguiente generación de
+                    entusiastas espaciales. La base técnica es sólida para expandirse a NASA o Blue Origin mañana
+                    mismo."
+                </p>
+                <div style="margin-top: 40px; display: flex; justify-content: center; gap: 20px;">
+                    <div class="stats-badge">100% OPERATIVO</div>
+                    <div class="stats-badge">LISTO PARA LAUNCH</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: PREGUNTAS -->
+        <section class="slide">
+            <h1 class="accent-text">¿PREGUNTAS?</h1>
+            <p style="font-size: 2rem; margin-top: 20px; font-weight: 300;">Q&A | 5 MINUTOS</p>
+            <div style="margin-top: 60px; font-family: 'JetBrains Mono', monospace; opacity: 0.5;">
+                GRACIAS POR SU ATENCIÓN <br> Mission Control: Online
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Controls -->
+    <div class="nav-controls no-print">
+        <button class="nav-btn" onclick="prevSlide()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg></button>
+        <button class="nav-btn" onclick="nextSlide()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg></button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slidesContainer');
+        const progressBar = document.getElementById('progressBar');
+
+        function updateSlide() {
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+            } else {
+                container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+
+            // Remove active class from all
+            slides.forEach(s => s.classList.remove('active'));
+            // Add to current
+            slides[currentSlide].classList.add('active');
+
+            // Progress
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Detect scroll for progress bar on mobile
+        window.addEventListener('scroll', () => {
+            if (window.innerWidth <= 768) {
+                const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                progressBar.style.width = `${scrollPercent}%`;
+
+                // Track active slide based on scroll position
+                slides.forEach((slide, index) => {
+                    const rect = slide.getBoundingClientRect();
+                    if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+                        currentSlide = index;
+                        slides.forEach(s => s.classList.remove('active'));
+                        slide.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Initialize first slide
+        updateSlide();
+    </script>
+</body>
+
+</html>

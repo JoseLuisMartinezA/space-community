@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memoria Final - Space Community</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d6cf;
+            --secondary: #7c3aed;
+            --background: #0B0E14;
+            --surface: #151A23;
+            --surface-accent: #1e2530;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --glow: rgba(0, 214, 207, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .stars-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, #1a1b26 0%, #0B0E14 70%);
+            z-index: -1;
+        }
+
+        .nebula {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(0, 214, 207, 0.08) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .logo-container {
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+
+        .logo-symbol {
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 30px var(--glow);
+            margin: 0 auto;
+        }
+
+        .logo-symbol::after {
+            content: '';
+            width: 40px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 5px;
+            transform: rotate(-45deg);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .meta-info {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .meta-item b {
+            color: var(--primary);
+            display: block;
+            font-size: 1rem;
+            margin-top: 4px;
+        }
+
+        /* Navigation / Index */
+        .index-nav {
+            background: var(--surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 80px;
+            backdrop-filter: blur(10px);
+        }
+
+        .index-nav h2 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .index-nav h2::before {
+            content: '>';
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .index-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+            list-style: none;
+        }
+
+        .index-list li a {
+            color: var(--text-dim);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .index-list li a:hover {
+            color: var(--primary);
+            background: rgba(0, 214, 207, 0.05);
+            transform: translateX(4px);
+        }
+
+        .index-list li a span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 100px;
+            scroll-margin-top: 40px;
+        }
+
+        .section-header {
+            margin-bottom: 32px;
+            border-left: 4px solid var(--primary);
+            padding-left: 24px;
+        }
+
+        .section-header h2 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            color: #cbd5e1;
+        }
+
+        strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Functional Cards */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 40px 0;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 214, 207, 0.3);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 0;
+        }
+
+        /* Technical Specs Table */
+        .tech-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 32px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tech-table th,
+        .tech-table td {
+            padding: 16px 24px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tech-table th {
+            background: rgba(0, 214, 207, 0.05);
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .tech-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            border-radius: 1px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -37px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background: var(--background);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--glow);
+        }
+
+        .timeline-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .timeline-content h4 {
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        /* Risks Matrix */
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 32px 0;
+        }
+
+        .risk-item {
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--surface-accent);
+        }
+
+        .risk-high {
+            border-left: 4px solid var(--error);
+        }
+
+        .risk-med {
+            border-left: 4px solid var(--warning);
+        }
+
+        .risk-low {
+            border-left: 4px solid var(--success);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 60px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .meta-info {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .index-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2e3440;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Highlights */
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .badge-primary {
+            background: rgba(0, 214, 207, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 214, 207, 0.2);
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--primary);
+        }
+
+        /* Print & PDF Adjustments */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: #0B0E14 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                padding: 20px !important;
+                max-width: 100% !important;
+            }
+
+            .index-nav,
+            .card,
+            .tech-table,
+            .risk-item {
+                break-inside: avoid;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            }
+
+            section {
+                break-before: page;
+                margin-bottom: 40px !important;
+            }
+
+            h1,
+            h2,
+            h3,
+            b,
+            strong {
+                color: #fff !important;
+            }
+
+            .stars-bg,
+            .nebula {
+                display: block !important;
+                opacity: 0.1;
+            }
+        }
+
+        /* Download Button */
+        .download-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: var(--background);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 20px var(--glow);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stars-bg"></div>
+    <div class="nebula"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo-symbol"></div>
+            </div>
+            <h1>SPACE COMMUNITY</h1>
+            <p class="subtitle">Memoria Final de Proyecto | Módulo Final Desarrollo Web</p>
+
+            <div class="meta-info">
+                <div class="meta-item">Fecha <b>Febrero 2026</b></div>
+                <div class="meta-item">Grupo <b>Grupo 2</b></div>
+                <div class="meta-item">Versión <b>1.0.0 Global</b></div>
+            </div>
+            <div class="meta-info" style="margin-top: 20px; font-size: 0.8rem;">
+                <div class="meta-item">Integrantes: <b>Elias Maatalat, Ismael Franco, Jose Luis Martinez, Lucilene
+                        Vidal</b></div>
+            </div>
+        </header>
+
+        <nav class="index-nav">
+            <h2>CONTENIDO</h2>
+            <ul class="index-list">
+                <li><a href="#intro"><span>01</span> Introducción y Contexto</a></li>
+                <li><a href="#justification"><span>02</span> Justificación de la Elección</a></li>
+                <li><a href="#objectives"><span>03</span> Objetivos Realizados</a></li>
+                <li><a href="#scope"><span>04</span> Alcance Final y Cambios</a></li>
+                <li><a href="#functional"><span>05</span> Descripción Funcional</a></li>
+                <li><a href="#technical"><span>06</span> Diseño Técnico y Arquitectura</a></li>
+                <li><a href="#planning"><span>07</span> Planificación Final</a></li>
+                <li><a href="#resources"><span>08</span> Recursos y Análisis de Costes</a></li>
+                <li><a href="#risks"><span>09</span> Gestión de Riesgos</a></li>
+                <li><a href="#conclusion"><span>10</span> Conclusiones y Viabilidad</a></li>
+                <li><a href="#annex"><span>11</span> Anexos Técnicos</a></li>
+            </ul>
+        </nav>
+
+        <!-- 01 Introducción -->
+        <section id="intro">
+            <div class="section-header">
+                <span class="badge badge-primary">Misión</span>
+                <h2>01. Introducción y Contexto</h2>
+                <p>El hub definitivo para la nueva era de exploración espacial.</p>
+            </div>
+            <p>
+                <strong>Space Community</strong> nace de la necesidad de centralizar la vasta pero dispersa información
+                sobre la industria aeroespacial moderna, centrada específicamente en el ecosistema de SpaceX. En un
+                mundo donde los lanzamientos se han vuelto semanales, los entusiastas requieren una herramienta de grado
+                profesional que combine telemetría en tiempo real con interacción comunitaria.
+            </p>
+            <p>
+                El proyecto se sitúa en un contexto donde el acceso al espacio se ha democratizado informativamente,
+                ofreciendo un espacio social unificado que permite a los usuarios compartir y debatir misiones
+                espaciales de forma profesional.
+            </p>
+        </section>
+
+        <!-- 02 Justificación -->
+        <section id="justification">
+            <div class="section-header">
+                <span class="badge badge-primary">Estrategia</span>
+                <h2>02. Justificación de la Elección</h2>
+                <p>Por qué apostamos por la Plataforma Interactiva SpaceX.</p>
+            </div>
+            <p>Hemos elegido este proyecto frente a otras alternativas por tres razones fundamentales:</p>
+            <div class="grid-cards">
+                <div class="card">
+                    <h3>Desafío Técnico Integral</h3>
+                    <p>Fusión de dos mundos: integración de datos técnicos externos y un sistema social complejo con
+                        comunicación en tiempo real.</p>
+                </div>
+                <div class="card">
+                    <h3>Tecnologías Modernas</h3>
+                    <p>Uso de un stack estratégico (React, Supabase, Tiempo Real) que proporciona una experiencia
+                        valiosa y
+                        demandada en el sector actual.</p>
+                </div>
+                <div class="card">
+                    <h3>Valor Diferencial</h3>
+                    <p>Combinamos la seriedad de los datos aeroespaciales con el dinamismo de una comunidad activa,
+                        creando una plataforma única.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03 Objetivos -->
+        <section id="objectives">
+            <div class="section-header">
+                <span class="badge badge-primary">Resultados</span>
+                <h2>03. Objetivos Alcanzados</h2>
+                <p>Metas estratégicas cumplidas durante el desarrollo.</p>
+            </div>
+            <p>Se han cumplido satisfactoriamente los objetivos planteados:</p>
+            <div class="grid-cards">
+                <div class="card">
+                    <span class="card-icon">🚀</span>
+                    <h3>Seguimiento 1:1</h3>
+                    <p>Integración total con la API de SpaceX para datos precisos de lanzamientos y flota.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">👥</span>
+                    <h3>Comunidad Activa</h3>
+                    <p>Sistema funcional con perfiles, gestión de alianzas (amigos) y debates en el foro.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">💬</span>
+                    <h3>Mensajería Privada</h3>
+                    <p>Chat privado 1-a-1 en tiempo real para comunicación exclusiva entre amigos.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 04 Alcance -->
+        <section id="scope">
+            <div class="section-header">
+                <span class="badge badge-primary">Evolución</span>
+                <h2>04. Alcance Final y Cambios</h2>
+                <p>Ajustes entre la propuesta inicial y el producto entregado.</p>
+            </div>
+            <p>El proyecto ha evolucionado desde su concepción inicial para adaptarse a herramientas más eficientes y
+                potentes:</p>
+            <table class="tech-table">
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Propuesta Inicial</th>
+                        <th>Producto Final</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Stack Core</strong></td>
+                        <td>Next.js (Monolito)</td>
+                        <td>Vite + React 19 (SPA de alto rendimiento)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Base de Datos</strong></td>
+                        <td>Turso (SQLite)</td>
+                        <td>Supabase (PostgreSQL + RLS Security)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tiempo Real</strong></td>
+                        <td>Socket.io / Node.js</td>
+                        <td>Supabase Realtime (Menor latencia, mayor escala)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Notificaciones</strong></td>
+                        <td>Email o manual</td>
+                        <td>In-app push notifications (Sistema Toast personalizado)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 05 Funcional -->
+        <section id="functional">
+            <div class="section-header">
+                <span class="badge badge-primary">UX/UI</span>
+                <h2>05. Descripción Funcional</h2>
+                <p>Ecosistema completo de módulos interconectados.</p>
+            </div>
+            <p>El sistema se divide en los siguientes módulos funcionales accesibles desde el panel de mando:</p>
+            <div class="grid-cards">
+                <div class="card">
+                    <h3>Panel de Misión (Dashboard)</h3>
+                    <p>Vista 360º con el próximo lanzamiento, estado de la flota de cohetes y estadísticas de aterrizaje
+                        globales.</p>
+                </div>
+                <div class="card">
+                    <h3>Archivo Launchpad</h3>
+                    <p>Historial completo de misiones con filtros de éxito/fallo y acceso a grabaciones originales.</p>
+                </div>
+                <div class="card">
+                    <h3>Comunidad (Transmisiones)</h3>
+                    <p>Espacio social donde los usuarios comparten hallazgos, multimedia y debaten sobre telemetría.</p>
+                </div>
+                <div class="card">
+                    <h3>Gestión de Alianzas</h3>
+                    <p>Sistema de amigos y chat privado que permite la comunicación directa entre entusiastas del
+                        sector.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 05 Técnico -->
+        <section id="technical">
+            <div class="section-header">
+                <span class="badge badge-primary">Stack</span>
+                <h2>06. Diseño Técnico y Arquitectura</h2>
+                <p>Cimentación tecnológica de alto rendimiento.</p>
+            </div>
+            <p>La arquitectura final reemplazó el modelo monolítico propuesto por una arquitectura <strong>Frontend
+                    React + BaaS (Backend as a Service)</strong>.</p>
+
+            <table class="tech-table">
+                <tr>
+                    <th>Capa</th>
+                    <th>Tecnología</th>
+                    <th>Propósito</th>
+                </tr>
+                <tr>
+                    <td><strong>Frontend</strong></td>
+                    <td>React 19 + TypeScript</td>
+                    <td>Interfaz reactiva con tipado estricto.</td>
+                </tr>
+                <tr>
+                    <td><strong>Backend / DB</strong></td>
+                    <td>Supabase (PostgreSQL)</td>
+                    <td>Gestión de datos y suscripciones en tiempo real.</td>
+                </tr>
+                <tr>
+                    <td><strong>Realtime</strong></td>
+                    <td>Supabase Channels</td>
+                    <td>Sincronización instantánea de chat y notificaciones.</td>
+                </tr>
+                <tr>
+                    <td><strong>Visualización</strong></td>
+                    <td>Recharts</td>
+                    <td>Gráficos dinámicos para el análisis de misiones y flota.</td>
+                </tr>
+            </table>
+
+            <p><strong>Decisión Crítica:</strong> Se optó por un <i>HashRouter</i> para facilitar el despliegue en
+                entornos estáticos sin configurar redirecciones de servidor pesadas.</p>
+        </section>
+
+        <!-- 07 Planificación -->
+        <section id="planning">
+            <div class="section-header">
+                <span class="badge badge-primary">Cronograma</span>
+                <h2>07. Planificación Final</h2>
+                <p>Recorrido temporal desde la concepción hasta el despegue.</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-date">SEMANA 1-3</span>
+                    <div class="timeline-content">
+                        <h4>Fase de Estructura y Diseño</h4>
+                        <p>Definición del Design System, Mockups en Figma y configuración inicial de Supabase y esquemas
+                            de tablas.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-date">SEMANA 4-7</span>
+                    <div class="timeline-content">
+                        <h4>Desarrollo del Core y SpaceX API</h4>
+                        <p>Implementación del Dashboard, integración con la API de SpaceX y sistema de autenticación de
+                            tripulación.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-date">SEMANA 8-10</span>
+                    <div class="timeline-content">
+                        <h4>Módulo Social y Networking</h4>
+                        <p>Desarrollo del Feed comunitario, sistema de amigos y arquitectura de chat en tiempo real.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-date">SEMANA 11-12</span>
+                    <div class="timeline-content">
+                        <h4>QA, Refactorización y Lanzamiento</h4>
+                        <p>Debugging de rutas, optimización de assets y despliegue final en producción.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 07 Recursos -->
+        <section id="resources">
+            <div class="section-header">
+                <span class="badge badge-primary">Economía</span>
+                <h2>08. Recursos y Análisis de Costes</h2>
+                <p>Análisis de la inversión humana y tecnológica.</p>
+            </div>
+            <p>El proyecto ha sido ejecutado por un equipo multidisciplinar equilibrado:</p>
+            <table class="tech-table">
+                <tr>
+                    <th>Rol / Perfil</th>
+                    <th>Recurso Humano</th>
+                    <th>Aportación Clave</th>
+                </tr>
+                <tr>
+                    <td>Lead Developer & Architect</td>
+                    <td>Jose Luis Martinez</td>
+                    <td>Core architecture y Supabase integration.</td>
+                </tr>
+                <tr>
+                    <td>Fullstack Developer</td>
+                    <td>Elias Maatalat Samahni</td>
+                    <td>Módulos sociales y lógica de tiempo real.</td>
+                </tr>
+                <tr>
+                    <td>Frontend Specialist</td>
+                    <td>Ismael Franco Ruiz</td>
+                    <td>UI/UX dinámico y visualización de datos SpaceX.</td>
+                </tr>
+                <tr>
+                    <td>QA & Lead Design</td>
+                    <td>Lucilene Vidal Lima</td>
+                    <td>Control de calidad, testing funcional y diseño UX final.</td>
+                </tr>
+                <tr style="background: rgba(16, 185, 129, 0.1);">
+                    <td colspan="2"><strong>TOTAL PRESUPUESTO RRHH</strong></td>
+                    <td><strong>€28.400</strong></td>
+                </tr>
+            </table>
+            <p><strong>Análisis de desviaciones:</strong> Se produjo un incremento del 5% sobre el presupuesto inicial
+                debido a la optimización de los canales de tiempo real y carga multimedia en el feed.</p>
+        </section>
+
+        <!-- 09 Riesgos -->
+        <section id="risks">
+            <div class="section-header">
+                <span class="badge badge-primary">Seguridad</span>
+                <h2>09. Análisis de Riesgos</h2>
+                <p>Contingencias gestionadas durante el desarrollo.</p>
+            </div>
+            <div class="risk-matrix">
+                <div class="risk-item risk-high">
+                    <h4>API Downtime</h4>
+                    <p>La API de SpaceX es pública y sin garantía de SLA. <b>Solución:</b> Implementación de cache local
+                        (LocalStorage) para datos históricos.</p>
+                </div>
+                <div class="risk-item risk-med">
+                    <h4>Consistencia de Datos</h4>
+                    <p>Posibles discrepancias en datos de lanzamientos históricos. <b>Solución:</b> Verificación cruzada
+                        y sistema de reporte de errores por usuarios.</p>
+                </div>
+                <div class="risk-item risk-low">
+                    <h4>Escalabilidad DB</h4>
+                    <p>Exceso de lecturas en Supabase Free Tier. <b>Solución:</b> Optimización de queries y uso de
+                        políticas RLS eficientes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10 Conclusiones -->
+        <section id="conclusion">
+            <div class="section-header">
+                <span class="badge badge-primary">Final</span>
+                <h2>10. Conclusiones Finales</h2>
+                <p>Evaluación de viabilidad y futuro del proyecto.</p>
+            </div>
+            <p>
+                Space Community ha demostrado ser un proyecto <strong>técnicamente viable y altamente
+                    escalable</strong>. La integración de datos técnicos con una base social sólida ofrece un valor
+                diferencial respecto a alternativas existentes.
+            </p>
+            <p>
+                La arquitectura elegida permite una iteración rápida, facilitando la futura inclusión de soporte para
+                otras agencias (NASA, ESA, Blue Origin) sin reestructurar el núcleo del sistema. El feedback inicial
+                indica una alta retención por parte de entusiastas de los datos técnicos.
+            </p>
+        </section>
+
+        <!-- 11 Anexos -->
+        <section id="annex">
+            <div class="section-header">
+                <span class="badge badge-primary">Detalle</span>
+                <h2>11. Anexos Técnicos</h2>
+                <p>Documentación complementaria y diagramas.</p>
+            </div>
+            <p><strong>A. Esquema de Base de Datos (Relacional):</strong></p>
+            <code>profiles[id] <-> posts[author_id] <-> comments[post_id]</code><br>
+            <code>posts[id] <-> post_likes[post_id]</code>
+
+            <p style="margin-top: 24px;"><strong>B. Decisiones de Diseño (Matriz):</strong></p>
+            <table class="tech-table" style="font-size: 0.85rem;">
+                <tr>
+                    <td><b>Paleta:</b> Cyan #00d6cf / Dark #0B0E14</td>
+                    <td>Inspira precisión tecnológica y profundidad espacial.</td>
+                </tr>
+                <tr>
+                    <td><b>Tipografía:</b> Plus Jakarta Sans</td>
+                    <td>Geometría moderna con alta legibilidad en paneles de datos.</td>
+                </tr>
+                <tr>
+                    <td><b>Interacción:</b> Framer Motion (concept)</td>
+                    <td>Transiciones fluidas que imitan pantallas de telemetría real.</td>
+                </tr>
+            </table>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Space Community Project. Desarrollado con pasión para la exploración humana.</p>
+        </footer>
+    </div>
+
+    <button onclick="window.print()" class="download-btn no-print">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        DESCARGAR PDF
+    </button>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -124,6 +124,19 @@ export const LandingPage: React.FC = () => {
 
             {/* Footer */}
             <footer className="border-t border-white/5 py-12 text-center text-slate-500 text-sm relative z-10">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="mb-8 p-6 rounded-2xl bg-primary/5 border border-primary/10 inline-block">
+                        <h4 className="text-white font-bold mb-2">Entregable de Grado</h4>
+                        <p className="mb-4 text-slate-400">Accede a la presentación oficial y memoria técnica del proyecto.</p>
+                        <Link
+                            to="/defense"
+                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-background-dark font-bold hover:bg-primary/90 transition-all hover:scale-105"
+                        >
+                            <span className="material-symbols-outlined">present_to_all</span>
+                            VER DEFENSA DEL PROYECTO
+                        </Link>
+                    </div>
+                </div>
                 <p>&copy; {new Date().getFullYear()} Space Community. No afiliado oficialmente con SpaceX.</p>
                 <div className="flex justify-center gap-4 mt-4">
                     <a href="#" className="hover:text-primary transition-colors">Términos</a>

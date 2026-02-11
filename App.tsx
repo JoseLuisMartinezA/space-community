@@ -15,6 +15,7 @@ import Rockets from './components/Rockets';
 import Statistics from './components/Statistics';
 import Chat from './components/Chat';
 import { LandingPage } from './components/LandingPage';
+import ProjectPresentation from './components/ProjectPresentation';
 
 
 import { NotificationProvider } from './context/NotificationContext';
@@ -53,6 +54,7 @@ const App: React.FC = () => {
                             <Route path="/" element={<LandingPage />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
+                            <Route path="/defense" element={<ProjectPresentation />} />
 
                             {/* Protected Routes */}
                             <Route element={<ProtectedRoute />}>
