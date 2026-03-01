@@ -129,7 +129,7 @@ export const LandingPage: React.FC = () => {
                         <h4 className="text-white font-bold mb-2">Entregable de Grado</h4>
                         <p className="mb-4 text-slate-400">Accede a la presentación oficial y memoria técnica del proyecto.</p>
                         <a
-                            href="/AMDWA_Presentacion_Grupo2.pdf"
+                            href="https://www.canva.com/design/DAHCl_CJlLg/BcyKYgT88dDCK5kclDT0vA/edit?utm_content=DAHCl_CJlLg&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-background-dark font-bold hover:bg-primary/90 transition-all hover:scale-105"
